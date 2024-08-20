@@ -5,11 +5,17 @@ project "Core"
   targetdir "bin/%{cfg.buildcfg}"
   staticruntime "off"
 
-  files { "src/**.h", "src/**.cpp" }
+  files { "src/**.h", "src/**.cpp", "src/glad.c"  }
 
   includedirs
   {
-    "src"
+    "src",
+    "../vendor/inc"
+  }
+
+  libdirs
+  {
+    "../vendor/lib"
   }
 
   targetdir ("../bin/" .. OutputDir .. "/%{prj.name}")

@@ -10,7 +10,13 @@ project "App"
   includedirs
   {
     "src",
-    "../Core/src"
+    "../Core/src",
+    "../vendor/inc"
+  }
+
+  libdirs
+  {
+    "../vendor/lib"
   }
 
   links
