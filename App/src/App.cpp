@@ -8,21 +8,68 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <Core/Core.h>
 
-
 float vertices[] = {
-	-1.0, -1.0, 0.0, 0.0, 0.0,
-	 1.0, -1.0, 0.0, 1.0, 0.0,
-	 1.0,  1.0, 0.0, 1.0, 1.0,
-	-1.0, -1.0, 0.0, 0.0, 0.0,
-	 1.0,  1.0, 0.0, 1.0, 1.0,
-	-1.0,  1.0, 0.0, 0.0, 1.0
+	// X Y Z U V
+
+	// FRONT FACE
+	-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f, -1.0f, 1.0f, 1.0f, 0.0f,
+	 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+
+	-1.0f, -1.0f, 1.0f, 0.0f, 0.0f,
+	 1.0f,  1.0f, 1.0f, 1.0f, 1.0f,
+	-1.0f,  1.0f, 1.0f, 0.0f, 1.0f,
+
+	// BACK FACE
+	 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	-1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+	-1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+
+	 1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	-1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+	 1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+
+	 // LEFT FACE
+	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+	-1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
+
+	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	-1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
+	-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+
+	// RIGHT FACE
+	1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
+	1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
+	1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+
+	1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
+	1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+	1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
+
+	// TOP FACE
+	-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,
+	 1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
+	 1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+
+	-1.0f,  1.0f,  1.0f, 0.0f, 0.0f,
+	 1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
+	-1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
+
+	// BOTTOM FACE
+	 1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
+	-1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
+	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+
+	 1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
+	-1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
+	 1.0f, -1.0f, -1.0f, 0.0f, 1.0f,
 };
 
-
-// Camera camera;
+Core::Render::Camera camera;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
-	// camera.setProjection(glm::radians(70.0f), (float)width / (float)height, 0.01f, 100.0f);
+	camera.setProjection(glm::radians(70.0f), (float)width / (float)height, 0.01f, 100.0f);
 }
 
 void process_input(GLFWwindow* window) {
@@ -63,14 +110,14 @@ int main() {
 
 	Core::GL::Shader shader("shaders/uv/vertex.glsl", "shaders/uv/fragment.glsl");
 
-	// Transform model;
-	// camera.view.translate(glm::vec3(0.0f, 0.0f, -4.0f));
+	Core::Render::Transform model;
+	camera.view.translate(glm::vec3(0.0f, 0.0f, -4.0f));
 
-	// shader.bind();
-	// shader.uniform_m("u_model_matrix", 4, &model.matrix()[0][0]);
-	// shader.uniform_m("u_view_matrix", 4, &camera.viewMatrix()[0][0]);
-	// shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);
-	// shader.unbind();
+	shader.bind();
+	shader.uniform_m("u_model_matrix", 4, &model.matrix()[0][0]);
+	shader.uniform_m("u_view_matrix", 4, &camera.viewMatrix()[0][0]);
+	shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);
+	shader.unbind();
 
 	float rot = 0.0f;
 
@@ -93,14 +140,14 @@ int main() {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		// model.rotateX(rot);
-		// model.rotateZ(rot * 0.333);
-		// model.rotateX(-rot);
-		// shader.bind();
-		// shader.uniform_m("u_model_matrix", 4, &model.matrix()[0][0]);
-		// shader.uniform_m("u_view_matrix", 4, &camera.viewMatrix()[0][0]);
-		// shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);
-		// shader.unbind();
+		model.rotateX(rot);
+		model.rotateZ(rot * 0.333);
+		model.rotateX(-rot);
+		shader.bind();
+		shader.uniform_m("u_model_matrix", 4, &model.matrix()[0][0]);
+		shader.uniform_m("u_view_matrix", 4, &camera.viewMatrix()[0][0]);
+		shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);
+		shader.unbind();
 		rot += glm::radians(0.5f);
 	}
 
