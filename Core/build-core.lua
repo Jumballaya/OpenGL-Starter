@@ -20,18 +20,18 @@ project "Core"
     defines { }
   
   filter "configurations:Debug"
-    define { "DEBUG" }
+    defines { "DEBUG" }
     runtime "Debug"
     symbols "On"
 
   filter "configurations:Release"
-    define { "RELEASE" }
+    defines { "RELEASE" }
     runtime "Release"
     optimize "On"
     symbols "On"
 
   filter "configurations:Dist"
-    define { "DIST" }
+    defines { "DIST" }
     runtime "Release"
     optimize "On"
     symbols "Off"
