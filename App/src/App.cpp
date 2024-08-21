@@ -2,6 +2,9 @@
 #include <string>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -80,8 +83,8 @@ void process_input(GLFWwindow* window) {
 
 int main() {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Spinning Cube", NULL, NULL);
@@ -113,7 +116,21 @@ int main() {
 	Core::Render::Transform model;
 	camera.view.translate(glm::vec3(0.0f, 0.0f, -4.0f));
 
+	int w, h, comp;
+	const uint8_t* img = stbi_load("textures/stucco.png", &w, &h, &comp, 3);
+
+	GLuint texture;
+	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
+	glTextureParameteri(texture, GL_TEXTURE_MAX_LEVEL, 0);
+	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTextureStorage2D(texture, 1, GL_RGB8, w, h);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTextureSubImage2D(texture, 0, 0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, img);
+	glBindTextures(0, 1, &texture);
+
 	shader.bind();
+	shader.uniform_i("u_texture", 0);
 	shader.uniform_m("u_model_matrix", 4, &model.matrix()[0][0]);
 	shader.uniform_m("u_view_matrix", 4, &camera.viewMatrix()[0][0]);
 	shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);

@@ -6,6 +6,9 @@ out vec4 outColor;
 
 in vec2 v_uv;
 
+uniform sampler2D u_texture;
+
 void main() {
-	outColor = vec4(v_uv, 1.0, 1.0);
+	vec4 color = texture(u_texture, v_uv);
+	outColor = color;
 }
