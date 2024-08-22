@@ -11,7 +11,11 @@ public:
 
 	void Draw(int width, int height);
 
-	void setupCallbacks(GLFWwindow* window);
+	void setCursorPosCallback(GLFWwindow* window, double x, double y);
+	void setMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+	void setScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+	void setCharCallback(GLFWwindow* window, unsigned int c);
+	void setKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
 	GLuint vao;

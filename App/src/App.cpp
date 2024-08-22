@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 
+#include <iostream>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
@@ -79,12 +81,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 
 int main()
 {
-	glfwSetErrorCallback(
-		[](int error, const char* description)
-		{
-			fprintf(stderr, "Error: %s\n", description);
-		}
-	);
+	glfwSetErrorCallback([](int error, const char* description) {
+		fprintf(stderr, "Error: %s\n", description);
+	});
 
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
@@ -94,20 +93,10 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Simple example", nullptr, nullptr);
-	if (!window)
-	{
+	if (!window) {
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-
-	glfwSetKeyCallback(
-		window,
-		[](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, GLFW_TRUE);
-		}
-	);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -132,6 +121,7 @@ int main()
 	const uint8_t* img = stbi_load("textures/stucco.png", &w, &h, &comp, 3);
 
 	GLuint texture;
+	glActiveTexture(GL_TEXTURE1);
 	glCreateTextures(GL_TEXTURE_2D, 1, &texture);
 	glTextureParameteri(texture, GL_TEXTURE_MAX_LEVEL, 0);
 	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -142,7 +132,7 @@ int main()
 	glBindTextures(0, 1, &texture);
 
 	shader.bind();
-	shader.uniform_i("u_texture", 0);
+	shader.uniform_i("u_texture", 1);
 	shader.uniform_m("u_model_matrix", 4, &model.matrix()[0][0]);
 	shader.uniform_m("u_view_matrix", 4, &camera.viewMatrix()[0][0]);
 	shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);
@@ -151,7 +141,31 @@ int main()
 	float rot = 0.0f;
 
 	Gui gui;
-	gui.setupCallbacks(window);
+	glfwSetWindowUserPointer(window, &gui);
+	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+		}
+		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		gui->setKeyCallback(window, key, scancode, action, mods);
+	});
+	glfwSetCursorPosCallback(window, [](auto* window, double x, double y) {
+		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		gui->setCursorPosCallback(window, x, y);
+	});
+	glfwSetMouseButtonCallback(window, [](auto* window, int button, int action, int mods) {
+		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		gui->setMouseButtonCallback(window, button, action, mods);
+	});
+	glfwSetScrollCallback(window, [](auto* window, double xOffset, double yOffset) {
+		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		gui->setScrollCallback(window, xOffset, yOffset);
+	});
+	glfwSetCharCallback(window, [](auto* window, unsigned int c) {
+		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		gui->setCharCallback(window, c);
+	});
+
 	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 
 	while (!glfwWindowShouldClose(window))
@@ -165,12 +179,11 @@ int main()
 		// Draw model
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 		vao.bind();
 		shader.bind();
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture);
-		shader.uniform_i("u_texture", 1);
 		glDrawArrays(GL_TRIANGLES, 0, vao.vertexCount());
 		vao.unbind();
 		shader.unbind();
