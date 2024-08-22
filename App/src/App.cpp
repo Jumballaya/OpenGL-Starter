@@ -13,6 +13,7 @@
 
 #include <Core/Core.h>
 #include "Gui.h"
+#include "Window.h"
 
 
 float vertices[] = {
@@ -79,31 +80,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	camera.setProjection(glm::radians(70.0f), (float)width / (float)height, 0.01f, 100.0f);
 }
 
-int main()
-{
-	glfwSetErrorCallback([](int error, const char* description) {
-		fprintf(stderr, "Error: %s\n", description);
-	});
-
-	if (!glfwInit())
-		exit(EXIT_FAILURE);
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Simple example", nullptr, nullptr);
-	if (!window) {
-		glfwTerminate();
-		exit(EXIT_FAILURE);
-	}
-
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-	glfwMakeContextCurrent(window);
-	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	glfwSwapInterval(1);
-
+int main() {
+	Window window;
+	window.setup(800, 600);
 
 	std::vector<Core::GL::VertexAttribute> attributes;
 	attributes.push_back({ 3, 0 });
@@ -141,37 +120,37 @@ int main()
 	float rot = 0.0f;
 
 	Gui gui;
-	glfwSetWindowUserPointer(window, &gui);
-	glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+	glfwSetWindowUserPointer(window.getWindowPointer(), &gui);
+	glfwSetKeyCallback(window.getWindowPointer(), [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 		}
+	auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+	gui->setKeyCallback(window, key, scancode, action, mods);
+		});
+	glfwSetCursorPosCallback(window.getWindowPointer(), [](auto* window, double x, double y) {
 		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setKeyCallback(window, key, scancode, action, mods);
-	});
-	glfwSetCursorPosCallback(window, [](auto* window, double x, double y) {
+	gui->setCursorPosCallback(window, x, y);
+		});
+	glfwSetMouseButtonCallback(window.getWindowPointer(), [](auto* window, int button, int action, int mods) {
 		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setCursorPosCallback(window, x, y);
-	});
-	glfwSetMouseButtonCallback(window, [](auto* window, int button, int action, int mods) {
+	gui->setMouseButtonCallback(window, button, action, mods);
+		});
+	glfwSetScrollCallback(window.getWindowPointer(), [](auto* window, double xOffset, double yOffset) {
 		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setMouseButtonCallback(window, button, action, mods);
-	});
-	glfwSetScrollCallback(window, [](auto* window, double xOffset, double yOffset) {
-		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setScrollCallback(window, xOffset, yOffset);
-	});
-	glfwSetCharCallback(window, [](auto* window, unsigned int c) {
+	gui->setScrollCallback(window, xOffset, yOffset);
+		});
+	glfwSetCharCallback(window.getWindowPointer(), [](auto* window, unsigned int c) {
 		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
 		gui->setCharCallback(window, c);
 	});
 
 	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 
-	while (!glfwWindowShouldClose(window))
+	while (!window.shouldClose())
 	{
 		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
+		window.getSize(&width, &height);
 
 		glViewport(0, 0, width, height);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -185,6 +164,10 @@ int main()
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glDrawArrays(GL_TRIANGLES, 0, vao.vertexCount());
+		shader.uniform_i("u_texture", 16);
+		glLineWidth(3.0f);
+		glDrawArrays(GL_LINES, 0, vao.vertexCount());
+		shader.uniform_i("u_texture", 1);
 		vao.unbind();
 		shader.unbind();
 
@@ -202,14 +185,11 @@ int main()
 		shader.unbind();
 		rot += glm::radians(0.5f);
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		window.update();
 	}
 
 	ImGui::DestroyContext();
+	window.destroy();
 
-	glfwDestroyWindow(window);
-
-	glfwTerminate();
 	exit(EXIT_SUCCESS);
 }
