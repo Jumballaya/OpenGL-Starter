@@ -5,7 +5,7 @@ project "Core"
   targetdir "bin/%{cfg.buildcfg}"
   staticruntime "off"
 
-  files { "src/**.h", "src/**.cpp", "src/glad.c"  }
+  files { "src/**.h", "src/**.cpp", "src/glad.c" }
 
   includedirs
   {

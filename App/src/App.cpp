@@ -1,15 +1,17 @@
-#include <iostream>
-#include <string>
-#include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <imgui/imgui.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+
 #include <Core/Core.h>
+#include "Gui.h"
+
 
 float vertices[] = {
 	// X Y Z U V
@@ -75,34 +77,44 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	camera.setProjection(glm::radians(70.0f), (float)width / (float)height, 0.01f, 100.0f);
 }
 
-void process_input(GLFWwindow* window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-		glfwSetWindowShouldClose(window, true);
-	}
-};
+int main()
+{
+	glfwSetErrorCallback(
+		[](int error, const char* description)
+		{
+			fprintf(stderr, "Error: %s\n", description);
+		}
+	);
 
-int main() {
-	glfwInit();
+	if (!glfwInit())
+		exit(EXIT_FAILURE);
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(800, 600, "Spinning Cube", NULL, NULL);
-	if (window == NULL) {
-		std::cerr << "Failed to create GLFW window" << std::endl;
+	GLFWwindow* window = glfwCreateWindow(800, 600, "Simple example", nullptr, nullptr);
+	if (!window)
+	{
 		glfwTerminate();
-		return -1;
+		exit(EXIT_FAILURE);
 	}
+
+	glfwSetKeyCallback(
+		window,
+		[](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{
+			if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, GLFW_TRUE);
+		}
+	);
+
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	glfwMakeContextCurrent(window);
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	glfwSwapInterval(1);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cerr << "Failed to initialize GLAD" << std::endl;
-		return -1;
-	}
-
-	glViewport(0, 0, 800, 600);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	std::vector<Core::GL::VertexAttribute> attributes;
 	attributes.push_back({ 3, 0 });
@@ -138,25 +150,35 @@ int main() {
 
 	float rot = 0.0f;
 
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
+	Gui gui;
+	gui.setupCallbacks(window);
+	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 
-	while (!glfwWindowShouldClose(window)) {
-		process_input(window);
+	while (!glfwWindowShouldClose(window))
+	{
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
 
-		// render
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, width, height);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-		// draw triangle
+		// Draw model
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glClear(GL_DEPTH_BUFFER_BIT);
 		vao.bind();
 		shader.bind();
-
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		shader.uniform_i("u_texture", 1);
 		glDrawArrays(GL_TRIANGLES, 0, vao.vertexCount());
+		vao.unbind();
+		shader.unbind();
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		// Draw gui
+		gui.Draw(width, height);
 
+		// Update model
 		model.rotateX(rot);
 		model.rotateZ(rot * 0.333);
 		model.rotateX(-rot);
@@ -166,9 +188,15 @@ int main() {
 		shader.uniform_m("u_projection_matrix", 4, &camera.projectionMatrix()[0][0]);
 		shader.unbind();
 		rot += glm::radians(0.5f);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 
-	glfwTerminate();
+	ImGui::DestroyContext();
 
-	return 0;
+	glfwDestroyWindow(window);
+
+	glfwTerminate();
+	exit(EXIT_SUCCESS);
 }

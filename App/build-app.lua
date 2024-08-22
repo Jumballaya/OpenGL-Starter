@@ -5,13 +5,14 @@ project "App"
   targetdir "bin/%{cfg.buildcfg}"
   staticruntime "off"
 
-  files { "src/**.h", "src/**.cpp" }
+  files { "src/**.h", "src/**.cpp", "../vendor/src/imgui/**.cpp", "../vendor/src/imgui/**.h" }
 
   includedirs
   {
     "src",
     "../Core/src",
-    "../vendor/inc"
+    "../vendor/inc",
+    "../vendor/src"
   }
 
   libdirs

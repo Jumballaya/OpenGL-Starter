@@ -18,17 +18,16 @@ static std::string get_file_contents(const char* path) {
 namespace Core {
 	namespace GL {
 		Shader::Shader(std::string vertexPath, std::string fragmentPath) {
-			std::string vertexShaderSourceString = get_file_contents("shaders/uv/vertex.glsl");
+			std::string vertexShaderSourceString = get_file_contents(vertexPath.c_str());
 			const GLchar* vertexShaderSource = vertexShaderSourceString.data();
-			std::string fragmentShaderSourceString = get_file_contents("shaders/uv/fragment.glsl");
+			std::string fragmentShaderSourceString = get_file_contents(fragmentPath.c_str());
 			const GLchar* fragmentShaderSource = fragmentShaderSourceString.data();
 			int success;
 			char infoLog[512];
 
 			program = glCreateProgram();
 
-			unsigned int vertexShader;
-			vertexShader = glCreateShader(GL_VERTEX_SHADER);
+			const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 			glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
 			glCompileShader(vertexShader);
 
@@ -39,8 +38,7 @@ namespace Core {
 				return;
 			}
 
-			unsigned int fragmentShader;
-			fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+			const GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 			glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 			glCompileShader(fragmentShader);
 
