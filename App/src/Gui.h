@@ -2,14 +2,17 @@
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
-#include "Core/GL/gl.h"
+#include <Core/GL/gl.h>
 
 class Gui {
 public:
 	Gui();
 	~Gui();
 
-	void Draw(int width, int height);
+	void setup();
+	void destroy();
+
+	void draw(int width, int height);
 
 	void setCursorPosCallback(GLFWwindow* window, double x, double y);
 	void setMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);

@@ -17,14 +17,26 @@ static std::string get_file_contents(const char* path) {
 }
 namespace Core {
 	namespace GL {
+
+		Shader::Shader() {
+			program = 0;
+		}
+
 		Shader::Shader(std::string vertexPath, std::string fragmentPath) {
+			setup(vertexPath, fragmentPath);
+		}
+
+		Shader::~Shader() {
+			glDeleteProgram(program);
+		}
+
+		void Shader::setup(std::string vertexPath, std::string fragmentPath) {
 			std::string vertexShaderSourceString = get_file_contents(vertexPath.c_str());
 			const GLchar* vertexShaderSource = vertexShaderSourceString.data();
 			std::string fragmentShaderSourceString = get_file_contents(fragmentPath.c_str());
 			const GLchar* fragmentShaderSource = fragmentShaderSourceString.data();
 			int success;
 			char infoLog[512];
-
 			program = glCreateProgram();
 
 			const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -62,11 +74,7 @@ namespace Core {
 
 			glDeleteShader(vertexShader);
 			glDeleteShader(fragmentShader);
-		}
-
-
-		Shader::~Shader() {
-			glDeleteProgram(program);
+			compiled = true;
 		}
 
 		void Shader::bind() {
@@ -74,7 +82,7 @@ namespace Core {
 		}
 
 		void Shader::unbind() {
-			glUseProgram(-1);
+			glUseProgram(0);
 		}
 
 		unsigned int Shader::get_location(std::string name) {
@@ -87,11 +95,13 @@ namespace Core {
 		};
 
 		void Shader::uniform_f(std::string name, float value) {
+			if (program == 0) return;
 			unsigned int loc = get_location(name);
 			glUniform1f(loc, value);
 		}
 
 		void Shader::uniform_v(std::string name, unsigned int size, float* value) {
+			if (program == 0) return;
 			unsigned int loc = get_location(name);
 			switch (size) {
 			case 1:
@@ -109,6 +119,7 @@ namespace Core {
 		}
 
 		void Shader::uniform_m(std::string name, unsigned int size, float* value) {
+			if (program == 0) return;
 			unsigned int loc = get_location(name);
 			switch (size) {
 			case 2:
@@ -125,6 +136,7 @@ namespace Core {
 
 
 		void Shader::uniform_i(std::string name, int value) {
+			if (program == 0) return;
 			unsigned int loc = get_location(name);
 			glUniform1i(loc, value);
 		}

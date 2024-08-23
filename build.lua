@@ -7,7 +7,7 @@ workspace "New Project"
   -- Workspace-wide build options for MSVC
   filter "system:windows"
     buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
-    links { "glfw3", "opengl32", "user32", "gdi32", "shell32" }
+    links { "glfw3", "opengl32", "user32", "gdi32", "shell32", "assimp-vc143-mt.lib", "assimp-vc143-mt.dll" }
     libdirs { "vendor/lib"}
 
 OutputDir = "%{cfg.system}-%{cfg.architecture}/%{cfg.buildcfg}"

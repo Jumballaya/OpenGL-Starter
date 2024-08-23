@@ -7,8 +7,11 @@ namespace Core {
 	namespace GL {	
 		class Shader {
 		public:
+			Shader();
 			Shader(std::string vertexPath, std::string fragmentPath);
 			~Shader();
+
+			void setup(std::string vertexPath, std::string fragmentPath);
 
 			void bind();
 			void unbind();
@@ -20,10 +23,10 @@ namespace Core {
 
 		private:
 			unsigned int program;
-
 			std::unordered_map<std::string, unsigned int> uniform_locations;
-
 			unsigned int get_location(std::string name);
+
+			bool compiled = false;
 		};
 	}
 }

@@ -145,7 +145,10 @@ static ImGuiKey get_imgui_key(int key) {
 	}
 }
 
-Gui::Gui() : guiShader(Core::GL::Shader("shaders/imgui/vertex.glsl", "shaders/imgui/fragment.glsl")) {
+Gui::Gui() {}
+
+void Gui::setup() {
+	guiShader.setup("shaders/imgui/vertex.glsl", "shaders/imgui/fragment.glsl");
 	glCreateVertexArrays(1, &vao);
 
 	glCreateBuffers(1, &bufferVertex);
@@ -218,10 +221,14 @@ Gui::Gui() : guiShader(Core::GL::Shader("shaders/imgui/vertex.glsl", "shaders/im
 }
 
 Gui::~Gui() {
+	destroy();
+}
+
+void Gui::destroy() {
 	ImGui::DestroyContext();
 }
 
-void Gui::Draw(int width, int height) {
+void Gui::draw(int width, int height) {
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
