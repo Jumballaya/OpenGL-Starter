@@ -40,7 +40,7 @@ namespace Core {
 		Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			std::vector<Vertex> vertices;
 			std::vector<GLuint> indices;
-			std::vector<Texture> textures;
+			std::vector<Core::GL::Texture> textures;
 
 			for (int i = 0; i < mesh->mNumVertices; i++) {
 				Vertex vertex;
@@ -78,17 +78,17 @@ namespace Core {
 			// material
 			if (mesh->mMaterialIndex >= 0) {
 				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-				std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+				std::vector<Core::GL::Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 				textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-				std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+				std::vector<Core::GL::Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			}
 
 			return Mesh(vertices, indices, textures);
 		}
 
-		std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
-			std::vector<Texture> textures;
+		std::vector<Core::GL::Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
+			std::vector<Core::GL::Texture> textures;
 			for (int i = 0; i < mat->GetTextureCount(type); i++) {
 				aiString str;
 				mat->GetTexture(type, i, &str);
@@ -102,8 +102,7 @@ namespace Core {
 					}
 				}
 				if (!skip) {		
-					Texture tex;
-					tex.id = loadTextureFromFile(str.C_Str(), directory);
+					Core::GL::Texture tex = loadTextureFromFile(str.C_Str(), directory);
 					tex.type = typeName;
 					tex.path = std::string(str.C_Str());
 					textures.push_back(tex);
@@ -112,43 +111,42 @@ namespace Core {
 			return textures;
 		}
 
-		GLuint Model::loadTextureFromFile(const char* path, const std::string &directory) {
+		Core::GL::Texture Model::loadTextureFromFile(const char* path, const std::string &directory) {
 			std::string filename = std::string(path);
 			filename = directory + '/' + filename;
 
-			unsigned int textureID;
-			glGenTextures(1, &textureID);
+			Core::GL::Texture tex;
+			Core::GL::TextureOptions opts;
 
 			int width, height, nrComponents;
-			unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-			if (data)
-			{
+			uint8_t* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+			if (data) {
 				GLenum format;
-				if (nrComponents == 1)
+				GLenum internalFormat;
+				if (nrComponents == 1) {
 					format = GL_RED;
-				else if (nrComponents == 3)
+					internalFormat = GL_R8;
+				} else if (nrComponents == 3) {
 					format = GL_RGB;
-				else if (nrComponents == 4)
+					internalFormat = GL_RGB8;
+				} else if (nrComponents == 4) {
 					format = GL_RGBA;
+					internalFormat = GL_RGBA8;
+				}
 
-				glBindTexture(GL_TEXTURE_2D, textureID);
-				glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-				glGenerateMipmap(GL_TEXTURE_2D);
+				opts.format = format;
+				opts.internalFormat = internalFormat;
+				opts.minFilter = GL_LINEAR_MIPMAP_LINEAR;
 
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				tex.setup(data, width, height, opts);
 
 				stbi_image_free(data);
-			}
-			else
-			{
+			} else {
 				std::cout << "Texture failed to load at path: " << path << std::endl;
 				stbi_image_free(data);
 			}
 
-			return textureID;
+			return tex;
 		}
 	}
 }

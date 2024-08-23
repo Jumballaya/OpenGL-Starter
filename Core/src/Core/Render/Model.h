@@ -5,7 +5,7 @@
 
 #include <assimp/scene.h>
 
-#include "Core/GL/Shader.h"
+#include "Core/GL/gl.h"
 #include "Mesh.h"
 
 namespace Core {
@@ -21,16 +21,14 @@ namespace Core {
 
 		private:
 			std::vector<Mesh> meshes;
-			std::vector<Texture> textures_loaded;
+			std::vector<Core::GL::Texture> textures_loaded;
 			std::string directory;
 
 			void loadModel(std::string path);
 			void processNode(aiNode* node, const aiScene* scene);
 			Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-
-			std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-
-			GLuint loadTextureFromFile(const char* path, const std::string& directory);
+			std::vector<Core::GL::Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+			Core::GL::Texture loadTextureFromFile(const char* path, const std::string& directory);
 		};
 	}
 }

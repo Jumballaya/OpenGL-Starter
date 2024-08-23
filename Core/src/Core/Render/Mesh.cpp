@@ -5,7 +5,7 @@ namespace Core {
 		Mesh::Mesh(
 			std::vector<Vertex> v,
 			std::vector<GLuint> i,
-			std::vector<Texture> t
+			std::vector<Core::GL::Texture> t
 		) : vertices(v), indices(i), textures(t) {
 			setupMesh();
 		}
@@ -36,9 +36,8 @@ namespace Core {
 		void Mesh::Draw(GL::Shader& shader) {
 			shader.bind();
 			for (int i = 0; i < textures.size(); i++) {
-				glActiveTexture(GL_TEXTURE0 + i);
+				textures[i].bind(i);
 				shader.uniform_i(textures[i].type, i);
-				glBindTexture(GL_TEXTURE_2D, textures[i].id);
 			}
 			glActiveTexture(GL_TEXTURE0);
 

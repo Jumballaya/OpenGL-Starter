@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "Core/GL/Shader.h"
+#include "Core/GL/gl.h"
 
 namespace Core {
 	namespace Render {
@@ -15,24 +15,21 @@ namespace Core {
 			glm::vec2 uv;
 		};
 
-		struct Texture {
-			GLuint id;
-			std::string type;
-			std::string path;
-		};
-
 		class Mesh {
 		public:
 			std::vector<Vertex> vertices;
 			std::vector<GLuint> indices;
-			std::vector<Texture> textures;
+			std::vector<Core::GL::Texture> textures;
 
-			Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Texture> textures);
+			Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Core::GL::Texture> textures);
 			~Mesh() = default;
 
 			void Draw(GL::Shader & shader);
 
 		private:
+			// VertexArray vao;
+			// VertexBuffer vbo;
+			// ElementBuffer ebo;
 			GLuint vao;
 			GLuint vbo;
 			GLuint ebo;
