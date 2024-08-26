@@ -86,7 +86,6 @@ namespace Core {
 				std::vector<GL::Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			}
-
 			return Mesh(vertices, indices, textures);
 		}
 

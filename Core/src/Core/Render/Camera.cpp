@@ -5,23 +5,29 @@
 namespace Core {
 	namespace Render {	
 		Camera::Camera() {
-			projection = glm::perspective(glm::radians(70.0f), 4.0f / 3.0f, 0.01f, 100.0f);
+			cameraData.projection_matrix = glm::perspective(glm::radians(70.0f), 4.0f / 3.0f, 0.01f, 100.0f);
+			cameraData.view_matrix = view.matrix();
 		}
 
 		Camera::~Camera() {
+			destroy();
+		}
 
+		void Camera::setup() {
+			ubo.setup();
+		}
+
+		void Camera::destroy() {
+			ubo.destroy();
 		}
 
 		void Camera::setProjection(float fov, float aspect, float near, float far) {
-			projection = glm::perspective(fov, aspect, near, far);
+			cameraData.projection_matrix = glm::perspective(fov, aspect, near, far);
 		}
 
-		glm::mat4 Camera::projectionMatrix() {
-			return projection;
-		}
-
-		glm::mat4 Camera::viewMatrix() {
-			return view.matrix();
+		void Camera::update() {
+			ubo.setData(cameraData);
+			ubo.bind(0);
 		}
 	}
 }

@@ -21,7 +21,6 @@ namespace Core {
 
 		private:
 			std::vector<Mesh> meshes;
-			std::vector<Core::GL::Texture> textures_loaded;
 			std::string directory;
 
 			void loadModel(std::string path);

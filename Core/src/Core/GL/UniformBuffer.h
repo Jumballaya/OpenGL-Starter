@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <glad/glad.h>
 
 namespace Core {
   namespace GL {
@@ -11,7 +12,7 @@ namespace Core {
         UniformBuffer(unsigned int idx = 0) : index(idx) {};
 
         ~UniformBuffer() {
-            glDeleteBuffers(1, &buffer);
+            destroy();
         }
 
         void setup() {
@@ -20,13 +21,17 @@ namespace Core {
             glBindBufferRange(GL_UNIFORM_BUFFER, index, buffer, 0, sizeof(T));
         }
 
-        void setData(T& data) {
-            glNamedBufferSubData(buffer, 0, sizeof(T), data);
+        void setData(T data) {
+            glNamedBufferSubData(buffer, 0, sizeof(T), &data);
         }
 
         void bind(unsigned int idx) {
             index = idx;
             glBindBufferRange(GL_UNIFORM_BUFFER, index, buffer, 0, sizeof(T));
+        }
+
+        void destroy() {
+            glDeleteBuffers(1, &buffer);
         }
 
     private:

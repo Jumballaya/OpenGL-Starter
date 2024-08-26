@@ -13,6 +13,7 @@ namespace Core {
 		}
 
 		Texture::~Texture() {
+			std::cout << "Texture destroyed" << std::endl;
 			glDeleteTextures(1, &texId);
 		}
 

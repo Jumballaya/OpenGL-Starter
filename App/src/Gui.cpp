@@ -236,6 +236,7 @@ void Gui::draw(int width, int height) {
 
 	guiShader.bind();
 	glBindVertexArray(vao);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, perFrameDataBuffer, 0, sizeof(glm::mat4));
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2((float)width, (float)height);

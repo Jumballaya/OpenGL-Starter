@@ -21,30 +21,14 @@ int main() {
 
 	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 
-	while (!app.window.shouldClose()) {
-		int width, height;
-		app.window.getSize(&width, &height);
-		glViewport(0, 0, width, height);
-
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-		// Update MVP
-		shader.bind();
-		shader.uniform_m("u_view_matrix", 4, &app.camera.viewMatrix()[0][0]);
-		shader.uniform_m("u_projection_matrix", 4, &app.camera.projectionMatrix()[0][0]);
-		shader.unbind();
-
-		// Draw model
+	app.run([&shader, &ent](App* app, int width, int height) {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 		shader.bind();
+		app->camera.update();
 		ent.draw();
 		shader.unbind();
-
-
-		// gui.draw(width, height);
-		app.window.update();
-	}
+	});
 
 	app.destroy();
 
