@@ -19,12 +19,12 @@ namespace Core {
 		public:
 			std::vector<Vertex> vertices;
 			std::vector<GLuint> indices;
-			std::vector<Core::GL::Texture> textures;
+			std::vector<Core::GL::Texture*> textures;
 
-			Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Core::GL::Texture> textures);
+			Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Core::GL::Texture*> textures);
 			~Mesh() = default;
 
-			void Draw(GL::Shader & shader);
+			void draw(GL::Shader& shader);
 
 		private:
 			// VertexArray vao;

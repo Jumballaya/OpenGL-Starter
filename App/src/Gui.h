@@ -25,6 +25,6 @@ private:
 	GLuint bufferVertex;
 	GLuint bufferElements;
 	GLuint perFrameDataBuffer;
-	GLuint textureFont;
 	Core::GL::Shader guiShader;
+	Core::GL::Texture texFont;
 };

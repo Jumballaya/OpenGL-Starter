@@ -12,8 +12,8 @@ namespace Core {
 			GLint maxLevel = 0;
 			GLint minFilter = GL_LINEAR;
 			GLint maxFilter = GL_LINEAR;
-			GLint wrapS = GL_REPEAT;
-			GLint wrapT = GL_REPEAT;
+			GLint wrapS = GL_CLAMP_TO_EDGE;
+			GLint wrapT = GL_CLAMP_TO_EDGE;
 			GLint internalFormat = GL_RGBA;
 			GLint format = GL_RGBA;
 		};
@@ -27,13 +27,17 @@ namespace Core {
 			void setup(uint8_t* data, int width, int height, const TextureOptions& opts);
 
 			void bind(GLuint slot);
+			void unbind(GLuint slot);
 
-			std::string type = "";
+			GLuint getId() { return texId; }
+
+			std::string name = ""; // uniform name
 			std::string path = "";
+			std::string fileName = "";
 
 			bool loaded = false;
 		private:
-			GLuint texId;
+			GLuint texId = 0;
 		
 		};
 

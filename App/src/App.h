@@ -11,7 +11,7 @@
 class App {
 public:
 	Window window;
-	Gui gui;
+	// Gui gui;
 	Core::Render::Camera camera;
 
 	App();

@@ -4,6 +4,8 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+
+#define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 namespace Core {
@@ -11,9 +13,10 @@ namespace Core {
 
 		void Model::draw(GL::Shader& shader) {
 			for (int i = 0; i < meshes.size(); i++) {
-				meshes[i].Draw(shader);
+				meshes[i].draw(shader);
 			}
 		}
+
 		void Model::loadModel(std::string path) {
 			Assimp::Importer import;
 			const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -40,7 +43,7 @@ namespace Core {
 		Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			std::vector<Vertex> vertices;
 			std::vector<GLuint> indices;
-			std::vector<Core::GL::Texture> textures;
+			std::vector<GL::Texture*> textures;
 
 			for (int i = 0; i < mesh->mNumVertices; i++) {
 				Vertex vertex;
@@ -78,70 +81,64 @@ namespace Core {
 			// material
 			if (mesh->mMaterialIndex >= 0) {
 				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-				std::vector<Core::GL::Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+				std::vector<GL::Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "u_texture_diffuse");
 				textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-				std::vector<Core::GL::Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+				std::vector<GL::Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			}
 
 			return Mesh(vertices, indices, textures);
 		}
 
-		std::vector<Core::GL::Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
-			std::vector<Core::GL::Texture> textures;
+		std::vector<GL::Texture*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
+			std::vector<GL::Texture*> textures;
+			unsigned int typeCount = 0;
 			for (int i = 0; i < mat->GetTextureCount(type); i++) {
 				aiString str;
 				mat->GetTexture(type, i, &str);
-
-				bool skip = false;
-				for (unsigned int j = 0; j < textures_loaded.size(); j++) {
-					if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
-						textures.push_back(textures_loaded[j]);
-						skip = true;
-						break;
-					}
-				}
-				if (!skip) {		
-					Core::GL::Texture tex = loadTextureFromFile(str.C_Str(), directory);
-					tex.type = typeName;
-					tex.path = std::string(str.C_Str());
-					textures.push_back(tex);
-				}
+				GL::Texture* tex = loadTextureFromFile(str.C_Str(), directory);
+				std::string filename = std::string(str.C_Str());
+				std::string path = directory + '/' + filename;
+				tex->name = typeName + "_" + std::to_string(typeCount++);
+				tex->fileName = filename;
+				tex->path = path;
+				textures.push_back(tex);
 			}
 			return textures;
 		}
 
-		Core::GL::Texture Model::loadTextureFromFile(const char* path, const std::string &directory) {
+		GL::Texture* Model::loadTextureFromFile(const char* path, const std::string& directory) {
 			std::string filename = std::string(path);
 			filename = directory + '/' + filename;
 
-			Core::GL::Texture tex;
-			Core::GL::TextureOptions opts;
+			GL::Texture* tex = new GL::Texture();
+			GL::TextureOptions opts;
 
-			int width, height, nrComponents;
-			uint8_t* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+			tex->path = filename;
+			tex->fileName = std::string(path);
+
+			int width, height, comps;
+			uint8_t* data = stbi_load(filename.c_str(), &width, &height, &comps, 0);
 			if (data) {
-				GLenum format;
-				GLenum internalFormat;
-				if (nrComponents == 1) {
-					format = GL_RED;
-					internalFormat = GL_R8;
-				} else if (nrComponents == 3) {
-					format = GL_RGB;
-					internalFormat = GL_RGB8;
-				} else if (nrComponents == 4) {
-					format = GL_RGBA;
-					internalFormat = GL_RGBA8;
+				GLenum format = GL_RGBA;
+				GLenum internalFormat = GL_RGBA8;
+				if (comps == 1) {
+					opts.format = GL_RED;
+					opts.internalFormat = GL_R8;
+				}
+				else if (comps == 3) {
+					opts.format = GL_RGB;
+					opts.internalFormat = GL_RGB8;
+				}
+				else if (comps == 4) {
+					opts.format = GL_RGBA;
+					opts.internalFormat = GL_RGBA8;
 				}
 
-				opts.format = format;
-				opts.internalFormat = internalFormat;
-				opts.minFilter = GL_LINEAR_MIPMAP_LINEAR;
-
-				tex.setup(data, width, height, opts);
-
+				tex->setup(data, width, height, opts);
 				stbi_image_free(data);
-			} else {
+			}
+			else {
 				std::cout << "Texture failed to load at path: " << path << std::endl;
 				stbi_image_free(data);
 			}

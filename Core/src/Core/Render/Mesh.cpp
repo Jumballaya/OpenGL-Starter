@@ -5,7 +5,7 @@ namespace Core {
 		Mesh::Mesh(
 			std::vector<Vertex> v,
 			std::vector<GLuint> i,
-			std::vector<Core::GL::Texture> t
+			std::vector<Core::GL::Texture*> t
 		) : vertices(v), indices(i), textures(t) {
 			setupMesh();
 		}
@@ -33,13 +33,11 @@ namespace Core {
 			glBindVertexArray(0);
 		}
 
-		void Mesh::Draw(GL::Shader& shader) {
-			shader.bind();
+		void Mesh::draw(GL::Shader& shader) {
 			for (int i = 0; i < textures.size(); i++) {
-				textures[i].bind(i);
-				shader.uniform_i(textures[i].type, i);
+				textures[i]->bind(i);
+				shader.uniform_i(textures[i]->name, i);
 			}
-			glActiveTexture(GL_TEXTURE0);
 
 			glBindVertexArray(vao);
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

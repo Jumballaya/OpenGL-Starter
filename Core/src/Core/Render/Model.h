@@ -27,8 +27,8 @@ namespace Core {
 			void loadModel(std::string path);
 			void processNode(aiNode* node, const aiScene* scene);
 			Mesh processMesh(aiMesh* mesh, const aiScene* scene);
-			std::vector<Core::GL::Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-			Core::GL::Texture loadTextureFromFile(const char* path, const std::string& directory);
+			std::vector<Core::GL::Texture*> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+			Core::GL::Texture* loadTextureFromFile(const char* path, const std::string& directory);
 		};
 	}
 }

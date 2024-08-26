@@ -11,32 +11,32 @@ App::~App() {
 
 void App::setup() {
 	window.setup(800, 600);
-	gui.setup();
+	// gui.setup();
 
-	glfwSetWindowUserPointer(window.getWindowPointer(), &gui);
+	//glfwSetWindowUserPointer(window.getWindowPointer(), &gui);
 	glfwSetWindowUserPointer(window.getWindowPointer(), &camera);
 	glfwSetKeyCallback(window.getWindowPointer(), [](GLFWwindow* window, int key, int scancode, int action, int mods) {
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 			glfwSetWindowShouldClose(window, GLFW_TRUE);
 		}
-		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setKeyCallback(window, key, scancode, action, mods);
+		//auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		//gui->setKeyCallback(window, key, scancode, action, mods);
 	});
 	glfwSetCursorPosCallback(window.getWindowPointer(), [](auto* window, double x, double y) {
-		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setCursorPosCallback(window, x, y);
+		//auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		//gui->setCursorPosCallback(window, x, y);
 	});
 	glfwSetMouseButtonCallback(window.getWindowPointer(), [](auto* window, int button, int action, int mods) {
-		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setMouseButtonCallback(window, button, action, mods);
+		//auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		//gui->setMouseButtonCallback(window, button, action, mods);
 	});
 	glfwSetScrollCallback(window.getWindowPointer(), [](auto* window, double xOffset, double yOffset) {
-		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setScrollCallback(window, xOffset, yOffset);
+		//auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		//gui->setScrollCallback(window, xOffset, yOffset);
 	});
 	glfwSetCharCallback(window.getWindowPointer(), [](auto* window, unsigned int c) {
-		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
-		gui->setCharCallback(window, c);
+		//auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
+		//gui->setCharCallback(window, c);
 	});
 	glfwSetFramebufferSizeCallback(window.getWindowPointer(), [](auto* window, int width, int height) {
 		glViewport(0, 0, width, height);
@@ -47,7 +47,7 @@ void App::setup() {
 
 void App::destroy() {
 	window.destroy();
-	gui.destroy();
+	// gui.destroy();
 }
 
 void App::run(const std::function <void(App*, int, int)>& fn) {
@@ -58,7 +58,7 @@ void App::run(const std::function <void(App*, int, int)>& fn) {
 
 		fn(this, width, height);
 
-		gui.draw(width, height);
+		// gui.draw(width, height);
 		window.update();
 	}
 }

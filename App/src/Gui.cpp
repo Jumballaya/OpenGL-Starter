@@ -176,6 +176,7 @@ void Gui::setup() {
 
 	guiShader.bind();
 
+	// Core::GL::UniformBuffer<glm::mat4> perFrameUbo;
 	glCreateBuffers(1, &perFrameDataBuffer);
 	glNamedBufferStorage(perFrameDataBuffer, sizeof(glm::mat4), nullptr, GL_DYNAMIC_STORAGE_BIT);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, perFrameDataBuffer);
@@ -199,16 +200,13 @@ void Gui::setup() {
 	int width, height;
 	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-	glCreateTextures(GL_TEXTURE_2D, 1, &textureFont);
-	glTextureParameteri(textureFont, GL_TEXTURE_MAX_LEVEL, 0);
-	glTextureParameteri(textureFont, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(textureFont, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTextureStorage2D(textureFont, 1, GL_RGBA8, width, height);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTextureSubImage2D(textureFont, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	glBindTextures(0, 1, &textureFont);
+	Core::GL::TextureOptions opts;
+	opts.format = GL_RGBA;
+	opts.internalFormat = GL_RGBA8;
+	texFont.setup(pixels, width, height, opts);
+	texFont.name = "Texture";
 
-	io.Fonts->TexID = (ImTextureID)(intptr_t)textureFont;
+	io.Fonts->TexID = (ImTextureID)(intptr_t)texFont.getId();
 	io.FontDefault = Font;
 	io.DisplayFramebufferScale = ImVec2(1, 1);
 
@@ -255,14 +253,12 @@ void Gui::draw(int width, int height) {
 
 	glNamedBufferSubData(perFrameDataBuffer, 0, sizeof(glm::mat4), glm::value_ptr(orthoProjection));
 
-	for (int n = 0; n < draw_data->CmdListsCount; n++)
-	{
+	for (int n = 0; n < draw_data->CmdListsCount; n++) {
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
 		glNamedBufferSubData(bufferVertex, 0, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), cmd_list->VtxBuffer.Data);
 		glNamedBufferSubData(bufferElements, 0, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), cmd_list->IdxBuffer.Data);
 
-		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
-		{
+		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
 			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
 			const ImVec4 cr = pcmd->ClipRect;
 			glScissor((int)cr.x, (int)(height - cr.w), (int)(cr.z - cr.x), (int)(cr.w - cr.y));
@@ -273,6 +269,7 @@ void Gui::draw(int width, int height) {
 	}
 
 	glScissor(0, 0, width, height);
+
 }
 
 void Gui::setCursorPosCallback(GLFWwindow* window, double x, double y) {
