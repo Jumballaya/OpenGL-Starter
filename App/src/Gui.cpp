@@ -1,8 +1,5 @@
 #include "Gui.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/ext.hpp>
 #include <imgui/imgui.h>
 
 static int translate_keycode(int key, int scancode) {
@@ -175,12 +172,8 @@ void Gui::setup() {
 	glBindVertexArray(vao);
 
 	guiShader.bind();
-
-	// Core::GL::UniformBuffer<glm::mat4> perFrameUbo;
-	glCreateBuffers(1, &perFrameDataBuffer);
-	glNamedBufferStorage(perFrameDataBuffer, sizeof(glm::mat4), nullptr, GL_DYNAMIC_STORAGE_BIT);
-	glBindBufferBase(GL_UNIFORM_BUFFER, 0, perFrameDataBuffer);
-
+	perFrameUbo.setup();
+	perFrameData.data = glm::identity<glm::mat4>();
 	ImGui::CreateContext();
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -203,7 +196,8 @@ void Gui::setup() {
 	Core::GL::TextureOptions opts;
 	opts.format = GL_RGBA;
 	opts.internalFormat = GL_RGBA8;
-	texFont.setup(pixels, width, height, opts);
+	texFont.setup();
+	texFont.load(pixels, width, height, opts);
 	texFont.name = "Texture";
 
 	io.Fonts->TexID = (ImTextureID)(intptr_t)texFont.getId();
@@ -236,7 +230,7 @@ void Gui::draw(int width, int height) {
 
 	guiShader.bind();
 	glBindVertexArray(vao);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, perFrameDataBuffer, 0, sizeof(glm::mat4));
+	perFrameUbo.bind(0);
 
 	ImGuiIO& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2((float)width, (float)height);
@@ -250,9 +244,9 @@ void Gui::draw(int width, int height) {
 	const float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
 	const float T = draw_data->DisplayPos.y;
 	const float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
-	const glm::mat4 orthoProjection = glm::ortho(L, R, B, T);
 
-	glNamedBufferSubData(perFrameDataBuffer, 0, sizeof(glm::mat4), glm::value_ptr(orthoProjection));
+	perFrameData.data = glm::ortho(L, R, B, T);
+	perFrameUbo.setData(perFrameData);
 
 	for (int n = 0; n < draw_data->CmdListsCount; n++) {
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];

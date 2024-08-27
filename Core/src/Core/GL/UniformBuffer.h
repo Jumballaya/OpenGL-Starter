@@ -10,10 +10,7 @@ namespace Core {
     class UniformBuffer {
     public:
         UniformBuffer(unsigned int idx = 0) : index(idx) {};
-
-        ~UniformBuffer() {
-            destroy();
-        }
+        ~UniformBuffer() = default;
 
         void setup() {
             glCreateBuffers(1, &buffer);

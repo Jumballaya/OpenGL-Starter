@@ -7,55 +7,47 @@
 namespace Core {
 	namespace GL {
 		VertexArray::VertexArray() {
-			glGenVertexArrays(1, &vao);
 			vertex_count = 0;
+			vao = 0;
 		}
 
-		VertexArray::~VertexArray() {
+		void VertexArray::setup() {
+			glCreateVertexArrays(1, &vao);
+		}
+
+		void VertexArray::destroy() {
 			for (auto buff : buffers) {
-				if (buff != NULL) delete buff;
+				if (buff != nullptr) buff->destroy();
 			}
 			buffers.clear();
 			glDeleteVertexArrays(1, &vao);
-		};
+		}
 
-		// Add individual buffers
-		void VertexArray::addBuffer(unsigned int count, unsigned int size, float* data) {
-			int idx = buffers.size();
-			bind();
-			VertexBuffer* buffer = new VertexBuffer(size, data);
-			buffers.push_back(buffer);
-			buffer->bind();
-			glEnableVertexAttribArray(idx);
-			glVertexAttribPointer(idx, count, GL_FLOAT, GL_FALSE, count * sizeof(float), (void*)0);
-			buffer->unbind();
-			unbind();
-
-			vertex_count = size / count / 4;
-		};
-
-		// Add interleved data buffer
-		void VertexArray::addBuffer(unsigned int size, float* data, unsigned int stride, std::vector<VertexAttribute> attributes) {
-			bind();
-			VertexBuffer* buffer = new VertexBuffer(size, data);
-			buffers.push_back(buffer);
-			buffer->bind();
-			int offset = 0;
+		void VertexArray::loadVertexBuffer(unsigned int size, unsigned int stride, float* data, std::vector<VertexAttribute> attributes) {
+			VertexBuffer* buffer = new VertexBuffer();
+			buffer->setup();
+			buffer->load(size, data);
 			int attrId = 0;
-			int attrCount = 0;
+			int vertexElems = 0;
+			glVertexArrayVertexBuffer(vao, 0, buffer->getId(), 0, stride);
 			for (VertexAttribute attr : attributes) {
-				glEnableVertexAttribArray(attrId);
-				glVertexAttribPointer(attrId, attr.size, GL_FLOAT, false, stride, (void*)attr.offset);
-				offset++;
+				glEnableVertexArrayAttrib(vao, attrId);
+				glVertexArrayAttribFormat(vao, attrId, attr.size, GL_FLOAT, GL_FALSE, attr.offset);
+				glVertexArrayAttribBinding(vao, attrId, 0);
 				attrId++;
-				attrCount += attr.size;
+				vertexElems += attr.size;
 			}
 
-			buffer->unbind();
-			unbind();
-
-			vertex_count = size / attrCount / 4;
+			vertex_count = size / vertexElems / 4;
+			buffers.push_back(buffer);
 		};
+
+		void VertexArray::loadElementBuffer(unsigned int size, unsigned int* data) {
+			elementBuffer.setup();
+			elementBuffer.bind(0);
+			elementBuffer.load(size, data);
+			glVertexArrayElementBuffer(vao, elementBuffer.getId());
+		}
 
 
 		void VertexArray::bind() {
@@ -63,8 +55,11 @@ namespace Core {
 		};
 
 		void VertexArray::unbind() {
-			glBindVertexArray(-1);
+			glBindVertexArray(0);
 		};
 	
+		unsigned int VertexArray::getId() {
+			return vao;
+		}
 	}
 }

@@ -2,7 +2,17 @@
 
 #include "glad/glad.h"
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext.hpp>
+
 #include <Core/GL/gl.h>
+
+struct GuiData {
+public:
+	glm::mat4 data;
+};
 
 class Gui {
 public:
@@ -24,7 +34,8 @@ private:
 	GLuint vao;
 	GLuint bufferVertex;
 	GLuint bufferElements;
-	GLuint perFrameDataBuffer;
+	Core::GL::UniformBuffer<GuiData> perFrameUbo;
+	GuiData perFrameData;
 	Core::GL::Shader guiShader;
 	Core::GL::Texture texFont;
 };

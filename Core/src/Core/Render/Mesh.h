@@ -8,6 +8,8 @@
 
 #include "Core/GL/gl.h"
 
+#include <memory>
+
 namespace Core {
 	namespace Render {
 		struct Vertex {
@@ -23,18 +25,10 @@ namespace Core {
 			std::vector<Core::GL::Texture*> textures;
 
 			Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Core::GL::Texture*> textures);
-			~Mesh() = default;
-
 			void draw(GL::Shader& shader);
 
 		private:
-			// VertexArray vao;
-			// VertexBuffer vbo;
-			// ElementBuffer ebo;
-			GLuint vao;
-			GLuint vbo;
-			GLuint ebo;
-
+			GL::VertexArray vao;
 			void setupMesh();
 		};
 	}

@@ -13,7 +13,7 @@ namespace Core {
 
 		void Model::draw(GL::Shader& shader) {
 			for (int i = 0; i < meshes.size(); i++) {
-				meshes[i].draw(shader);
+				meshes[i]->draw(shader);
 			}
 		}
 
@@ -33,14 +33,14 @@ namespace Core {
 		void Model::processNode(aiNode* node, const aiScene* scene) {
 			for (int i = 0; i < node->mNumMeshes; i++) {
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-				meshes.push_back(processMesh(mesh, scene));
+				processMesh(mesh, scene);
 			}
 			for (int i = 0; i < node->mNumChildren; i++) {
 				processNode(node->mChildren[i], scene);
 			}
 		}
 
-		Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+		void Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			std::vector<Vertex> vertices;
 			std::vector<GLuint> indices;
 			std::vector<GL::Texture*> textures;
@@ -86,7 +86,9 @@ namespace Core {
 				std::vector<GL::Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			}
-			return Mesh(vertices, indices, textures);
+
+			Mesh* _mesh = new Mesh(vertices, indices, textures);
+			meshes.push_back(_mesh);
 		}
 
 		std::vector<GL::Texture*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
@@ -134,7 +136,8 @@ namespace Core {
 					opts.internalFormat = GL_RGBA8;
 				}
 
-				tex->setup(data, width, height, opts);
+				tex->setup();
+				tex->load(data, width, height, opts);
 				stbi_image_free(data);
 			}
 			else {

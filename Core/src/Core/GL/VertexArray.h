@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 #include "Vertexbuffer.h"
+#include "ElementBuffer.h"
 
 namespace Core {
 	namespace GL {
@@ -14,10 +16,14 @@ namespace Core {
 		class VertexArray {
 		public:
 			VertexArray();
-			~VertexArray();
+			~VertexArray() = default;
 
-			void addBuffer(unsigned int count, unsigned int size, float* data);
-			void addBuffer(unsigned int size, float* data, unsigned int stride, std::vector<VertexAttribute> attributes);
+			void loadVertexBuffer(unsigned int size, unsigned int stride, float* data, std::vector<VertexAttribute> attributes);
+			void loadElementBuffer(unsigned int size, unsigned int* data);
+
+			unsigned int getId();
+			void setup();
+			void destroy();
 
 			void bind();
 			void unbind();
@@ -29,6 +35,7 @@ namespace Core {
 			unsigned int vertex_count;
 
 			std::vector<VertexBuffer*> buffers;
+			ElementBuffer elementBuffer;
 		};
 	}
 }

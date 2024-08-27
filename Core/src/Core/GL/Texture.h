@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 
 #include <glad/glad.h>
@@ -23,8 +24,10 @@ namespace Core {
 			Texture();
 			~Texture();
 
-			void setup(const char* path, const TextureOptions& opts);
-			void setup(uint8_t* data, int width, int height, const TextureOptions& opts);
+			void setup();
+
+			void load(const char* path, const TextureOptions& opts);
+			void load(uint8_t* data, int width, int height, const TextureOptions& opts);
 
 			void bind(GLuint slot);
 			void unbind(GLuint slot);

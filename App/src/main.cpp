@@ -6,18 +6,18 @@
 #include <assimp/postprocess.h>
 
 #include <queue>
+#include <vector>
 
 
 int main() {
 	App app;
-	std::vector<Core::GL::Texture*> textures;
 
 	Core::GL::Shader shader("shaders/model/vertex.glsl", "shaders/model/fragment.glsl");
 	Core::Render::Model duckModel("models/duck/Duck.gltf");
 	Entity ent(&duckModel, &shader);
 
 	ent.transform.scale(glm::vec3(0.05f));
-	ent.transform.translate(glm::vec3(0.0f, -5.0f, -10.0f));
+	ent.transform.translate(glm::vec3(0.0f, -4.0f, -8.0f));
 
 	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 

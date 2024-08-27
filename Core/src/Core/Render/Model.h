@@ -19,13 +19,13 @@ namespace Core {
 
 			void draw(GL::Shader& shader);
 
+			std::vector<Mesh*> meshes;
 		private:
-			std::vector<Mesh> meshes;
 			std::string directory;
 
 			void loadModel(std::string path);
 			void processNode(aiNode* node, const aiScene* scene);
-			Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+			void processMesh(aiMesh* mesh, const aiScene* scene);
 			std::vector<Core::GL::Texture*> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
 			Core::GL::Texture* loadTextureFromFile(const char* path, const std::string& directory);
 		};

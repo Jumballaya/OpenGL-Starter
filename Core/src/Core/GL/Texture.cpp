@@ -13,7 +13,6 @@ namespace Core {
 		}
 
 		Texture::~Texture() {
-			std::cout << "Texture destroyed" << std::endl;
 			glDeleteTextures(1, &texId);
 		}
 
@@ -27,10 +26,13 @@ namespace Core {
 			glBindTextureUnit(slot, 0);
 		}
 
-		void Texture::setup(const char* path, const TextureOptions& opts) {
+		void Texture::setup() {
+			glCreateTextures(GL_TEXTURE_2D, 1, &texId);
+		}
+
+		void Texture::load(const char* path, const TextureOptions& opts) {
 			if (loaded) return;
 			TextureOptions _opts = opts;
-			glCreateTextures(GL_TEXTURE_2D, 1, &texId);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opts.wrapS);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opts.wrapT);
 			glTextureParameteri(texId, GL_TEXTURE_MAX_LEVEL, opts.maxLevel);
@@ -63,7 +65,7 @@ namespace Core {
 			loaded = true;
 		}
 
-		void Texture::setup(uint8_t* img, int w, int h, const TextureOptions& opts) {
+		void Texture::load(uint8_t* img, int w, int h, const TextureOptions& opts) {
 			if (loaded) return;
 			glCreateTextures(GL_TEXTURE_2D, 1, &texId);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opts.wrapS);
