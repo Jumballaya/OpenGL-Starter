@@ -3,14 +3,19 @@
 #include <vector>
 #include <iostream>
 
+#include <glad/glad.h>
+
 #include "Vertexbuffer.h"
 #include "ElementBuffer.h"
 
 namespace Core {
 	namespace GL {
 		struct VertexAttribute {
-			int size;   // number of elements
-			int offset; // offset in bytes
+		public:
+			int size;        // number of elements
+			int offset;      // offset in bytes
+			GLenum type;     // GL_FLOAT or GL_UNSIGNED_BYTE etc
+			bool normalized; // is the data normalized?
 		};
 
 		class VertexArray {
@@ -24,6 +29,9 @@ namespace Core {
 			unsigned int getId();
 			void setup();
 			void destroy();
+
+			VertexBuffer getVertexBuffer(unsigned int id);
+			ElementBuffer getElementBuffer();
 
 			void bind();
 			void unbind();

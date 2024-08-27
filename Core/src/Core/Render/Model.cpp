@@ -13,11 +13,13 @@ namespace Core {
 
 		void Model::draw(GL::Shader& shader) {
 			for (int i = 0; i < meshes.size(); i++) {
-				meshes[i]->draw(shader);
+				meshes[i].draw(shader);
 			}
 		}
 
-		void Model::loadModel(std::string path) {
+		void Model::setup() {}
+
+		void Model::load(std::string path) {
 			Assimp::Importer import;
 			const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -30,20 +32,26 @@ namespace Core {
 			processNode(scene->mRootNode, scene);
 		}
 
+		void Model::destroy() {
+			for (auto mesh : meshes) {
+				mesh.destroy();
+			}
+		}
+
 		void Model::processNode(aiNode* node, const aiScene* scene) {
 			for (int i = 0; i < node->mNumMeshes; i++) {
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-				processMesh(mesh, scene);
+				meshes.push_back(processMesh(mesh, scene));
 			}
 			for (int i = 0; i < node->mNumChildren; i++) {
 				processNode(node->mChildren[i], scene);
 			}
 		}
 
-		void Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+		Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			std::vector<Vertex> vertices;
 			std::vector<GLuint> indices;
-			std::vector<GL::Texture*> textures;
+			std::vector<GL::Texture> textures;
 
 			for (int i = 0; i < mesh->mNumVertices; i++) {
 				Vertex vertex;
@@ -81,42 +89,41 @@ namespace Core {
 			// material
 			if (mesh->mMaterialIndex >= 0) {
 				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-				std::vector<GL::Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "u_texture_diffuse");
+				std::vector<GL::Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "u_texture_diffuse");
 				textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-				std::vector<GL::Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
+				std::vector<GL::Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
 				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 			}
 
-			Mesh* _mesh = new Mesh(vertices, indices, textures);
-			meshes.push_back(_mesh);
+			return Mesh(vertices, indices, textures);
 		}
 
-		std::vector<GL::Texture*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
-			std::vector<GL::Texture*> textures;
+		std::vector<GL::Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
+			std::vector<GL::Texture> textures;
 			unsigned int typeCount = 0;
 			for (int i = 0; i < mat->GetTextureCount(type); i++) {
 				aiString str;
 				mat->GetTexture(type, i, &str);
-				GL::Texture* tex = loadTextureFromFile(str.C_Str(), directory);
+				GL::Texture tex = loadTextureFromFile(str.C_Str(), directory);
 				std::string filename = std::string(str.C_Str());
 				std::string path = directory + '/' + filename;
-				tex->name = typeName + "_" + std::to_string(typeCount++);
-				tex->fileName = filename;
-				tex->path = path;
+				tex.name = typeName + "_" + std::to_string(typeCount++);
+				tex.fileName = filename;
+				tex.path = path;
 				textures.push_back(tex);
 			}
 			return textures;
 		}
 
-		GL::Texture* Model::loadTextureFromFile(const char* path, const std::string& directory) {
+		GL::Texture Model::loadTextureFromFile(const char* path, const std::string& directory) {
 			std::string filename = std::string(path);
 			filename = directory + '/' + filename;
 
-			GL::Texture* tex = new GL::Texture();
+			GL::Texture tex;
 			GL::TextureOptions opts;
 
-			tex->path = filename;
-			tex->fileName = std::string(path);
+			tex.path = filename;
+			tex.fileName = std::string(path);
 
 			int width, height, comps;
 			uint8_t* data = stbi_load(filename.c_str(), &width, &height, &comps, 0);
@@ -136,8 +143,8 @@ namespace Core {
 					opts.internalFormat = GL_RGBA8;
 				}
 
-				tex->setup();
-				tex->load(data, width, height, opts);
+				tex.setup();
+				tex.load(data, width, height, opts);
 				stbi_image_free(data);
 			}
 			else {

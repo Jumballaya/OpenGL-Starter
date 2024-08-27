@@ -11,6 +11,7 @@ namespace Core {
 
 			void setup();
 			void load(unsigned int size, float* data);
+			void update(unsigned int size, float* data);
 			void destroy();
 
 			unsigned int getId();

@@ -145,31 +145,17 @@ static ImGuiKey get_imgui_key(int key) {
 Gui::Gui() {}
 
 void Gui::setup() {
-	guiShader.setup("shaders/imgui/vertex.glsl", "shaders/imgui/fragment.glsl");
-	glCreateVertexArrays(1, &vao);
-
-	glCreateBuffers(1, &bufferVertex);
-	glNamedBufferStorage(bufferVertex, 128 * 1024, nullptr, GL_DYNAMIC_STORAGE_BIT);
-
-	glCreateBuffers(1, &bufferElements);
-	glNamedBufferStorage(bufferElements, 256 * 1024, nullptr, GL_DYNAMIC_STORAGE_BIT);
-
-	glVertexArrayElementBuffer(vao, bufferElements);
-	glVertexArrayVertexBuffer(vao, 0, bufferVertex, 0, sizeof(ImDrawVert));
-
-	glEnableVertexArrayAttrib(vao, 0);
-	glEnableVertexArrayAttrib(vao, 1);
-	glEnableVertexArrayAttrib(vao, 2);
-
-	glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, GL_FALSE, IM_OFFSETOF(ImDrawVert, pos));
-	glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, GL_FALSE, IM_OFFSETOF(ImDrawVert, uv));
-	glVertexArrayAttribFormat(vao, 2, 4, GL_UNSIGNED_BYTE, GL_TRUE, IM_OFFSETOF(ImDrawVert, col));
-
-	glVertexArrayAttribBinding(vao, 0, 0);
-	glVertexArrayAttribBinding(vao, 1, 0);
-	glVertexArrayAttribBinding(vao, 2, 0);
-
-	glBindVertexArray(vao);
+	guiShader.setup();
+	guiShader.load("shaders/imgui/vertex.glsl", "shaders/imgui/fragment.glsl");
+	vao.setup();
+	vao.bind();
+	vao.loadVertexBuffer(128 * 1024, sizeof(ImDrawVert), nullptr, std::vector<Core::GL::VertexAttribute>({
+		{ 2, IM_OFFSETOF(ImDrawVert, pos), GL_FLOAT, false },
+		{ 2, IM_OFFSETOF(ImDrawVert, uv), GL_FLOAT, false },
+		{ 4, IM_OFFSETOF(ImDrawVert, col), GL_UNSIGNED_BYTE, true },
+	}));
+	vao.loadElementBuffer(256 * 1024, nullptr);
+	vao.unbind();
 
 	guiShader.bind();
 	perFrameUbo.setup();
@@ -229,7 +215,7 @@ void Gui::draw(int width, int height) {
 	glEnable(GL_SCISSOR_TEST);
 
 	guiShader.bind();
-	glBindVertexArray(vao);
+	vao.bind();
 	perFrameUbo.bind(0);
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -250,9 +236,8 @@ void Gui::draw(int width, int height) {
 
 	for (int n = 0; n < draw_data->CmdListsCount; n++) {
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];
-		glNamedBufferSubData(bufferVertex, 0, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), cmd_list->VtxBuffer.Data);
-		glNamedBufferSubData(bufferElements, 0, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), cmd_list->IdxBuffer.Data);
-
+		vao.getVertexBuffer(0).update((GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (float*)cmd_list->VtxBuffer.Data);
+		vao.getElementBuffer().update((GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (unsigned int*)cmd_list->IdxBuffer.Data);
 		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++) {
 			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
 			const ImVec4 cr = pcmd->ClipRect;

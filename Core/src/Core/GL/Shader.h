@@ -9,10 +9,11 @@ namespace Core {
 		class Shader {
 		public:
 			Shader();
-			Shader(std::string vertexPath, std::string fragmentPath);
-			~Shader();
+			~Shader() = default;
 
-			void setup(std::string vertexPath, std::string fragmentPath);
+			void setup();
+			void load(std::string vertexPath, std::string fragmentPath);
+			void destroy();
 
 			void bind();
 			void unbind();

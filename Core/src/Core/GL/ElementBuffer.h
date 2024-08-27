@@ -11,6 +11,7 @@ namespace Core {
 
         void setup();
         void load(unsigned int size, unsigned int* data);
+        void update(unsigned int size, unsigned int* data);
         void destroy();
 
         void bind(unsigned int bindPoint);

@@ -22,22 +22,17 @@ namespace Core {
 			program = 0;
 		}
 
-		Shader::Shader(std::string vertexPath, std::string fragmentPath) {
-			setup(vertexPath, fragmentPath);
+		void Shader::setup() {
+			program = glCreateProgram();
 		}
 
-		Shader::~Shader() {
-			glDeleteProgram(program);
-		}
-
-		void Shader::setup(std::string vertexPath, std::string fragmentPath) {
+		void Shader::load(std::string vertexPath, std::string fragmentPath) {
 			std::string vertexShaderSourceString = get_file_contents(vertexPath.c_str());
 			const GLchar* vertexShaderSource = vertexShaderSourceString.data();
 			std::string fragmentShaderSourceString = get_file_contents(fragmentPath.c_str());
 			const GLchar* fragmentShaderSource = fragmentShaderSourceString.data();
 			int success;
 			char infoLog[512];
-			program = glCreateProgram();
 
 			const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 			glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -75,6 +70,10 @@ namespace Core {
 			glDeleteShader(vertexShader);
 			glDeleteShader(fragmentShader);
 			compiled = true;
+		}
+
+		void Shader::destroy() {
+			glDeleteProgram(program);
 		}
 
 		void Shader::bind() {

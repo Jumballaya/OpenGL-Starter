@@ -8,13 +8,17 @@ class Entity {
 public:
 	Core::Render::Transform transform;
 
-	Entity(Core::Render::Model* m, Core::GL::Shader* s) : transform(Core::Render::Transform()), shader(s), model(m) {
-	};
+	Entity() = default;
 	~Entity() = default;
 
-	void draw();
+	void setup();
+	void loadShader(std::string vertex, std::string fragment);
+	void loadModel(std::string path);
+	void destroy();
+
+	void draw(Core::Render::Camera& camera);
 
 private:
-	Core::GL::Shader* shader;
-	Core::Render::Model* model;
+	Core::GL::Shader shader;
+	Core::Render::Model model;
 };

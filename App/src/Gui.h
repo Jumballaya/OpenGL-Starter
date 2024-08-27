@@ -31,11 +31,9 @@ public:
 	void setKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
-	GLuint vao;
-	GLuint bufferVertex;
-	GLuint bufferElements;
-	Core::GL::UniformBuffer<GuiData> perFrameUbo;
 	GuiData perFrameData;
+	Core::GL::VertexArray vao;
+	Core::GL::UniformBuffer<GuiData> perFrameUbo;
 	Core::GL::Shader guiShader;
 	Core::GL::Texture texFont;
 };

@@ -23,6 +23,15 @@ namespace Core {
 			glDeleteVertexArrays(1, &vao);
 		}
 
+
+		VertexBuffer VertexArray::getVertexBuffer(unsigned int id) {
+			return *buffers[id];
+		}
+
+		ElementBuffer VertexArray::getElementBuffer() {
+			return elementBuffer;
+		}
+
 		void VertexArray::loadVertexBuffer(unsigned int size, unsigned int stride, float* data, std::vector<VertexAttribute> attributes) {
 			VertexBuffer* buffer = new VertexBuffer();
 			buffer->setup();
@@ -32,7 +41,7 @@ namespace Core {
 			glVertexArrayVertexBuffer(vao, 0, buffer->getId(), 0, stride);
 			for (VertexAttribute attr : attributes) {
 				glEnableVertexArrayAttrib(vao, attrId);
-				glVertexArrayAttribFormat(vao, attrId, attr.size, GL_FLOAT, GL_FALSE, attr.offset);
+				glVertexArrayAttribFormat(vao, attrId, attr.size, attr.type, attr.normalized ? GL_TRUE : GL_FALSE, attr.offset);
 				glVertexArrayAttribBinding(vao, attrId, 0);
 				attrId++;
 				vertexElems += attr.size;

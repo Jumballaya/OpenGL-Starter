@@ -13,21 +13,24 @@ namespace Core {
 		
 		class Model {
 		public:
-			Model(std::string path) {
-				loadModel(path);
-			}
+			Model() = default;
+			~Model() = default;
+
+			void setup();
+			void load(std::string path);
+			void destroy();
 
 			void draw(GL::Shader& shader);
 
-			std::vector<Mesh*> meshes;
 		private:
 			std::string directory;
+			std::vector<Mesh> meshes;
 
-			void loadModel(std::string path);
+			Core::GL::Texture loadTextureFromFile(const char* path, const std::string& directory);
+			std::vector<Core::GL::Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
+			Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 			void processNode(aiNode* node, const aiScene* scene);
-			void processMesh(aiMesh* mesh, const aiScene* scene);
-			std::vector<Core::GL::Texture*> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);
-			Core::GL::Texture* loadTextureFromFile(const char* path, const std::string& directory);
+
 		};
 	}
 }

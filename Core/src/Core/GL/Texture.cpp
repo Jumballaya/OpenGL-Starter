@@ -12,10 +12,6 @@ namespace Core {
 			texId = 0;
 		}
 
-		Texture::~Texture() {
-			glDeleteTextures(1, &texId);
-		}
-
 		void Texture::bind(GLuint slot) {
 			if (!loaded) return;
 			glBindTextureUnit(slot, texId);
@@ -28,6 +24,10 @@ namespace Core {
 
 		void Texture::setup() {
 			glCreateTextures(GL_TEXTURE_2D, 1, &texId);
+		}
+
+		void Texture::destroy() {
+			glDeleteTextures(1, &texId);
 		}
 
 		void Texture::load(const char* path, const TextureOptions& opts) {

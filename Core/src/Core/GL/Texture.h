@@ -22,12 +22,12 @@ namespace Core {
 		class Texture {
 		public:
 			Texture();
-			~Texture();
+			~Texture() = default;
 
 			void setup();
-
 			void load(const char* path, const TextureOptions& opts);
 			void load(uint8_t* data, int width, int height, const TextureOptions& opts);
+			void destroy();
 
 			void bind(GLuint slot);
 			void unbind(GLuint slot);
