@@ -18,7 +18,7 @@ public:
 
 	void draw(Core::Render::Camera& camera);
 
-private:
-	Core::GL::Shader shader;
 	Core::Render::Model model;
+	Core::GL::Shader shader;
+private:
 };

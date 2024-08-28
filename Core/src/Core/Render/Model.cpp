@@ -4,8 +4,6 @@
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
 namespace Core {

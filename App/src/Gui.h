@@ -22,6 +22,7 @@ public:
 	void setup();
 	void destroy();
 
+	void startFrame(int width, int height);
 	void draw(int width, int height);
 
 	void setCursorPosCallback(GLFWwindow* window, double x, double y);
@@ -29,6 +30,9 @@ public:
 	void setScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 	void setCharCallback(GLFWwindow* window, unsigned int c);
 	void setKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+	// Components
+	void drawTextureWindowGL(const char* title, uint32_t texId);
 
 private:
 	GuiData perFrameData;

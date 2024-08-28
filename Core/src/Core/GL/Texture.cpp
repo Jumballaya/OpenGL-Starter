@@ -1,8 +1,6 @@
 #include "Texture.h"
 
 #include <stdint.h>
-#include <stb/stb_image.h>
-
 #include <iostream>
 
 namespace Core {
@@ -33,18 +31,13 @@ namespace Core {
 		void Texture::load(const char* path, const TextureOptions& opts) {
 			if (loaded) return;
 			TextureOptions _opts = opts;
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opts.wrapS);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opts.wrapT);
-			glTextureParameteri(texId, GL_TEXTURE_MAX_LEVEL, opts.maxLevel);
-			glTextureParameteri(texId, GL_TEXTURE_MIN_FILTER, opts.minFilter);
-			glTextureParameteri(texId, GL_TEXTURE_MAG_FILTER, opts.maxFilter);
-			glGenerateTextureMipmap(texId);
+			Render::Bitmap image;
+			image.load(path, opts.type == GL_FLOAT ? Render::BitmapFormat_Float : Render::BitmapFormat_UnsignedByte);
 
-			int w, h, comps;
-			uint8_t* img = stbi_load(path, &w, &h, &comps, 0);
+			int w = image.getWidth();
+			int h = image.getHeight();
+			int comps = image.getComponentCount();
 
-			GLenum format = GL_RGBA;
-			GLenum internalFormat = GL_RGBA8;
 			if (comps == 1) {
 				_opts.format = GL_RED;
 				_opts.internalFormat = GL_R8;
@@ -58,27 +51,38 @@ namespace Core {
 				_opts.internalFormat = GL_RGBA8;
 			}
 
-			glTextureStorage2D(texId, 1, _opts.internalFormat, w, h);
-			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-			glTextureSubImage2D(texId, 0, 0, 0, w, h, _opts.format, GL_UNSIGNED_BYTE, img);
-			stbi_image_free(img);
+			load(image, _opts);
+
 			loaded = true;
 		}
 
 		void Texture::load(uint8_t* img, int w, int h, const TextureOptions& opts) {
 			if (loaded) return;
-			glCreateTextures(GL_TEXTURE_2D, 1, &texId);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opts.wrapS);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opts.wrapT);
+			glCreateTextures(opts.textureType, 1, &texId);
+			glTextureParameteri(texId, GL_TEXTURE_WRAP_S, opts.wrapS);
+			glTextureParameteri(texId, GL_TEXTURE_WRAP_T, opts.wrapT);
+			glTextureParameteri(texId, GL_TEXTURE_WRAP_R, opts.wrapR);
 			glTextureParameteri(texId, GL_TEXTURE_MAX_LEVEL, opts.maxLevel);
+			glTextureParameteri(texId, GL_TEXTURE_BASE_LEVEL, opts.baseLevel);
 			glTextureParameteri(texId, GL_TEXTURE_MIN_FILTER, opts.minFilter);
-			glTextureParameteri(texId, GL_TEXTURE_MAG_FILTER, opts.maxFilter);
+			glTextureParameteri(texId, GL_TEXTURE_MAG_FILTER, opts.magFilter);
 			glGenerateTextureMipmap(texId);
 
 			glTextureStorage2D(texId, 1, opts.internalFormat, w, h);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-			glTextureSubImage2D(texId, 0, 0, 0, w, h, opts.format, GL_UNSIGNED_BYTE, img);
+			glTextureSubImage2D(texId, 0, 0, 0, w, h, opts.format, opts.type, img);
 			loaded = true;
 		}
+
+		void Texture::load(Render::Bitmap& bitmap, const TextureOptions& opts) {
+			if (loaded) return;
+			std::vector<uint8_t> imgData = bitmap.getData();
+			uint8_t* img = imgData.data();
+			int w = bitmap.getWidth();
+			int h = bitmap.getHeight();
+			int comps = bitmap.getComponentCount();
+			load(img, w, h, opts);
+		}
+
 	}
 }

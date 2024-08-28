@@ -59,6 +59,7 @@ void App::run(const std::function <void(App*, int, int)>& fn) {
 
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+		gui.startFrame(width, height);
 		fn(this, width, height);
 
 		gui.draw(width, height);

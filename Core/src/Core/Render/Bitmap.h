@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #include <glm/glm.hpp>
 
@@ -23,11 +24,12 @@ namespace Core {
 			~Bitmap() = default;
 
 			void setup() {};
+			void load(std::string path, BitmapFormat fmt);
 			void load(int w, int h, int comp, BitmapFormat fmt);
 			void load(int w, int h, int d, int comp, BitmapFormat fmt);
 			void load(int w, int h, int comp, BitmapFormat fmt, const void* ptr);
 			void destroy();
-			void save();
+			void save(std::string path);
 
 			void setPixel(int x, int y, const glm::vec4& c);
 			glm::vec4 getPixel(int x, int y) const;
@@ -37,6 +39,9 @@ namespace Core {
 			int getComponentCount();
 			BitmapFormat getFormat();
 			BitmapType getType();
+			std::vector<uint8_t> getData() { return data; };
+
+			void setType(BitmapType typ) { type = typ; }
 
 			static int BytesPerComponent(BitmapFormat format) {
 				if (format == BitmapFormat_UnsignedByte) return 1;

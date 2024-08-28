@@ -7,6 +7,7 @@ namespace Core {
 		Camera::Camera() {
 			cameraData.projection_matrix = glm::perspective(glm::radians(70.0f), 4.0f / 3.0f, 0.01f, 100.0f);
 			cameraData.view_matrix = view.matrix();
+			cameraData.camera_position = glm::vec4(0.0f);
 		}
 
 		Camera::~Camera() {
@@ -29,5 +30,12 @@ namespace Core {
 			ubo.setData(cameraData);
 			ubo.bind(0);
 		}
+
+		void Camera::moveTo(glm::vec3 position) {
+			cameraData.camera_position.x = position.x;
+			cameraData.camera_position.y = position.y;
+			cameraData.camera_position.z = position.z;
+		}
+
 	}
 }

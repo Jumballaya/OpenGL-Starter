@@ -22,9 +22,9 @@ namespace Core {
 
 			void draw(GL::Shader& shader);
 
+			std::vector<Mesh> meshes;
 		private:
 			std::string directory;
-			std::vector<Mesh> meshes;
 
 			Core::GL::Texture loadTextureFromFile(const char* path, const std::string& directory);
 			std::vector<Core::GL::Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);

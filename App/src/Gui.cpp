@@ -206,6 +206,16 @@ void Gui::destroy() {
 	ImGui::DestroyContext();
 }
 
+void Gui::startFrame(int width, int height) {
+	ImGuiIO& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2((float)width, (float)height);
+	ImGui::NewFrame();
+
+	guiShader.unbind();
+	vao.unbind();
+}
+
+
 void Gui::draw(int width, int height) {
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
@@ -218,10 +228,6 @@ void Gui::draw(int width, int height) {
 	vao.bind();
 	perFrameUbo.bind(0);
 
-	ImGuiIO& io = ImGui::GetIO();
-	io.DisplaySize = ImVec2((float)width, (float)height);
-	ImGui::NewFrame();
-	ImGui::ShowDemoWindow();
 	ImGui::Render();
 
 	const ImDrawData* draw_data = ImGui::GetDrawData();
@@ -250,6 +256,16 @@ void Gui::draw(int width, int height) {
 
 	glScissor(0, 0, width, height);
 
+}
+
+void Gui::drawTextureWindowGL(const char* title, uint32_t texId) {
+	ImGui::Begin(title, nullptr);
+	const ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+	const ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+	ImGui::Image(
+		(void*)(intptr_t)texId,
+		ImVec2(vMax.x - vMin.x, vMax.y - vMin.y));
+	ImGui::End();
 }
 
 void Gui::setCursorPosCallback(GLFWwindow* window, double x, double y) {

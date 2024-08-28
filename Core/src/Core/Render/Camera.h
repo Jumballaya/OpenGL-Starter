@@ -10,6 +10,7 @@ namespace Core {
 		struct CameraData {
 			glm::mat4 view_matrix;
 			glm::mat4 projection_matrix;
+			glm::vec4 camera_position;
 		};
 
 		class Camera {
@@ -18,6 +19,8 @@ namespace Core {
 			~Camera();
 
 			void setProjection(float fov, float aspect, float near, float far);
+
+			void moveTo(glm::vec3 position);
 			
 			void setup();
 			void update();

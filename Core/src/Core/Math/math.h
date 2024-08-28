@@ -1,7 +1,7 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
 #include <cmath>
+#include <corecrt_math_defines.h>;
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
