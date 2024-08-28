@@ -2,8 +2,6 @@
 #include <fstream>
 #include <iostream>
 
-#include <glad/glad.h>
-
 #include "Shader.h"
 
 static std::string get_file_contents(const char* path) {
@@ -15,6 +13,25 @@ static std::string get_file_contents(const char* path) {
 	}
 	return ss.str();
 }
+
+static void glsl_inject_includes(std::string& code, std::string directory, int depth = 0) {
+	if (depth > 30) return;
+	while (code.find("#include ") != code.npos) {
+		const auto pos = code.find("#include ");
+		const auto p1 = code.find('<', pos);
+		const auto p2 = code.find('>', pos);
+		if (p1 == code.npos || p2 == code.npos || p2 <= p1) {
+			std::cerr << "Error while loading shader program:\n" << code << std::endl;
+			return;
+		}
+		const std::string name = directory + "/" + code.substr(p1 + 1, p2 - p1 - 1);
+		std::string include = get_file_contents(name.c_str());
+		std::string dir = name.substr(0, name.find_last_of('/'));
+		glsl_inject_includes(include, dir, depth + 1);
+		code.replace(pos, p2 - pos + 1, include.c_str());
+	}
+}
+
 namespace Core {
 	namespace GL {
 
@@ -34,27 +51,8 @@ namespace Core {
 			int success;
 			char infoLog[512];
 
-			const GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-			glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-			glCompileShader(vertexShader);
-
-			glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-			if (!success) {
-				glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-				std::cerr << "ERROR: Vertex Shader Compilation failed\n" << infoLog << std::endl;
-				return;
-			}
-
-			const GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-			glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-			glCompileShader(fragmentShader);
-
-			glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-			if (!success) {
-				glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-				std::cerr << "ERROR: Fragment Shader Compilation failed\n" << infoLog << std::endl;
-				return;
-			}
+			GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexPath);
+			GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentPath);
 
 			glAttachShader(program, vertexShader);
 			glAttachShader(program, fragmentShader);
@@ -72,6 +70,27 @@ namespace Core {
 			compiled = true;
 		}
 
+		GLuint Shader::compileShader(GLenum type, std::string path) {
+			std::string sourceString = get_file_contents(path.c_str());
+			std::string directory = path.substr(0, path.find_last_of('/'));
+			glsl_inject_includes(sourceString, directory);
+			const GLchar* source = sourceString.data();
+			GLuint shader = glCreateShader(type);
+			glShaderSource(shader, 1, &source, NULL);
+			glCompileShader(shader);
+
+			int success;
+			char infoLog[512];
+			glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+			if (!success) {
+				glGetShaderInfoLog(shader, 512, NULL, infoLog);
+				std::cerr << "ERROR: Shader Compilation failed\n" << infoLog << std::endl;
+				return 0;
+			}
+			return shader;
+		}
+
+
 		void Shader::destroy() {
 			glDeleteProgram(program);
 		}
@@ -84,11 +103,11 @@ namespace Core {
 			glUseProgram(0);
 		}
 
-		unsigned int Shader::get_location(std::string name) {
+		GLuint Shader::get_location(std::string name) {
 			if (uniform_locations.find(name) != uniform_locations.end()) {
 				return uniform_locations.at(name);
 			}
-			unsigned int loc = glGetUniformLocation(program, name.c_str());
+			GLuint loc = glGetUniformLocation(program, name.c_str());
 			uniform_locations.insert({ name, loc });
 			return loc;
 		};

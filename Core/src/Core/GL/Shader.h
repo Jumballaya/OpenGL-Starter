@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+#include <glad/glad.h>
+
 namespace Core {
 	namespace GL {	
 		class Shader {
@@ -24,9 +26,11 @@ namespace Core {
 			void uniform_m(std::string name, unsigned int size, float* value);
 
 		private:
-			unsigned int program;
-			std::unordered_map<std::string, unsigned int> uniform_locations;
-			unsigned int get_location(std::string name);
+			GLuint program;
+			std::unordered_map<std::string, GLuint> uniform_locations;
+			GLuint get_location(std::string name);
+
+			GLuint compileShader(GLenum type, std::string path);
 
 			bool compiled = false;
 		};

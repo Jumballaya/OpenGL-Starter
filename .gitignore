@@ -12,3 +12,6 @@ Makefile
 
 # Exclude
 !vendor/bin
+
+# ImGUI
+imgui.ini
