@@ -2,47 +2,39 @@
 
 #include <glm/glm.hpp>
 
-#include <stb/stb_image.h>
-#include <stb/stb_image_write.h>
-
-using Core::Render::Bitmap;
-using Core::Math::clamp;
-using glm::ivec2;
-using glm::vec3;
-using glm::vec4;
-vec3 faceCoordsToXYZ(int i, int j, int faceID, int faceSize) {
+glm::vec3 faceCoordsToXYZ(int i, int j, int faceID, int faceSize) {
 	const float A = 2.0f * float(i) / faceSize;
 	const float B = 2.0f * float(j) / faceSize;
 
-	if (faceID == 0) return vec3(-1.0f, A - 1.0f, B - 1.0f);
-	if (faceID == 1) return vec3(A - 1.0f, -1.0f, 1.0f - B);
-	if (faceID == 2) return vec3(1.0f, A - 1.0f, 1.0f - B);
-	if (faceID == 3) return vec3(1.0f - A, 1.0f, 1.0f - B);
-	if (faceID == 4) return vec3(B - 1.0f, A - 1.0f, 1.0f);
-	if (faceID == 5) return vec3(1.0f - B, A - 1.0f, -1.0f);
+	if (faceID == 0) return glm::vec3(-1.0f, A - 1.0f, B - 1.0f);
+	if (faceID == 1) return glm::vec3(A - 1.0f, -1.0f, 1.0f - B);
+	if (faceID == 2) return glm::vec3(1.0f, A - 1.0f, 1.0f - B);
+	if (faceID == 3) return glm::vec3(1.0f - A, 1.0f, 1.0f - B);
+	if (faceID == 4) return glm::vec3(B - 1.0f, A - 1.0f, 1.0f);
+	if (faceID == 5) return glm::vec3(1.0f - B, A - 1.0f, -1.0f);
 
-	return vec3();
+	return glm::vec3();
 }
 
-Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
+Core::Render::Bitmap convertEquirectangularMapToVerticalCross(Core::Render::Bitmap& b)
 {
-	if (b.getType() != Core::Render::BitmapType_2D) return Bitmap();
+	if (b.getType() != Core::Render::BitmapType_2D) return Core::Render::Bitmap();
 
 	const int faceSize = b.getWidth() / 4;
 
 	const int w = faceSize * 3;
 	const int h = faceSize * 4;
 
-	Bitmap result;
+	Core::Render::Bitmap result;
 	result.load(w, h, b.getComponentCount(), b.getFormat());
 
-	const ivec2 kFaceOffsets[] = {
-		ivec2(faceSize, faceSize * 3),
-		ivec2(0, faceSize),
-		ivec2(faceSize, faceSize),
-		ivec2(faceSize * 2, faceSize),
-		ivec2(faceSize, 0),
-		ivec2(faceSize, faceSize * 2)
+	const glm::ivec2 kFaceOffsets[] = {
+		glm::ivec2(faceSize, faceSize * 3),
+		glm::ivec2(0, faceSize),
+		glm::ivec2(faceSize, faceSize),
+		glm::ivec2(faceSize * 2, faceSize),
+		glm::ivec2(faceSize, 0),
+		glm::ivec2(faceSize, faceSize * 2)
 	};
 
 	const int clampW = b.getWidth() - 1;
@@ -54,7 +46,7 @@ Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
 		{
 			for (int j = 0; j != faceSize; j++)
 			{
-				const vec3 P = faceCoordsToXYZ(i, j, face, faceSize);
+				const glm::vec3 P = faceCoordsToXYZ(i, j, face, faceSize);
 				const float R = hypot(P.x, P.y);
 				const float theta = atan2(P.y, P.x);
 				const float phi = atan2(P.z, R);
@@ -62,20 +54,20 @@ Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
 				const float Uf = float(2.0f * faceSize * (theta + M_PI) / M_PI);
 				const float Vf = float(2.0f * faceSize * (M_PI / 2.0f - phi) / M_PI);
 				// 4-samples for bilinear interpolation
-				const int U1 = clamp(int(floor(Uf)), 0, clampW);
-				const int V1 = clamp(int(floor(Vf)), 0, clampH);
-				const int U2 = clamp(U1 + 1, 0, clampW);
-				const int V2 = clamp(V1 + 1, 0, clampH);
+				const int U1 = Core::Math::clamp(int(floor(Uf)), 0, clampW);
+				const int V1 = Core::Math::clamp(int(floor(Vf)), 0, clampH);
+				const int U2 = Core::Math::clamp(U1 + 1, 0, clampW);
+				const int V2 = Core::Math::clamp(V1 + 1, 0, clampH);
 				// fractional part
 				const float s = Uf - U1;
 				const float t = Vf - V1;
 				// fetch 4-samples
-				const vec4 A = b.getPixel(U1, V1);
-				const vec4 B = b.getPixel(U2, V1);
-				const vec4 C = b.getPixel(U1, V2);
-				const vec4 D = b.getPixel(U2, V2);
+				const glm::vec4 A = b.getPixel(U1, V1);
+				const glm::vec4 B = b.getPixel(U2, V1);
+				const glm::vec4 C = b.getPixel(U1, V2);
+				const glm::vec4 D = b.getPixel(U2, V2);
 				// bilinear interpolation
-				const vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
+				const glm::vec4 color = A * (1 - s) * (1 - t) + B * (s) * (1 - t) + C * (1 - s) * t + D * (s) * (t);
 				result.setPixel(i + kFaceOffsets[face].x, j + kFaceOffsets[face].y, color);
 			}
 		};
@@ -84,27 +76,31 @@ Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
 	return result;
 }
 
-Bitmap convertVerticalCrossToCubeMapFaces(Bitmap& b) {
+Core::Render::Bitmap convertVerticalCrossToCubeMapFaces(Core::Render::Bitmap& b)
+{
 	const int faceWidth = b.getWidth() / 3;
 	const int faceHeight = b.getHeight() / 4;
 
-	Bitmap cubemap;
+	Core::Render::Bitmap cubemap;
 	cubemap.setType(Core::Render::BitmapType_Cube);
 	cubemap.load(faceWidth, faceHeight, 6, b.getComponentCount(), b.getFormat());
 
-	const std::vector<uint8_t> bitmapData = b.getData();
-	std::vector<uint8_t> cubemapData = cubemap.getData();
-	const uint8_t* src = bitmapData.data();
-	uint8_t* dst = cubemapData.data();
-	const int pixelSize = cubemap.getComponentCount() * Bitmap::BytesPerComponent(cubemap.getFormat());
+	const uint8_t* src = b.getData().data();
+	uint8_t* dst = cubemap.getData().data();
 
-	for (int face = 0; face != 6; ++face) {
-		for (int j = 0; j != faceHeight; ++j) {
-			for (int i = 0; i != faceWidth; ++i) {
+	const int pixelSize = cubemap.getComponentCount() * Core::Render::Bitmap::BytesPerComponent(cubemap.getFormat());
+
+	for (int face = 0; face != 6; ++face)
+	{
+		for (int j = 0; j != faceHeight; ++j)
+		{
+			for (int i = 0; i != faceWidth; ++i)
+			{
 				int x = 0;
 				int y = 0;
 
-				switch (face) {
+				switch (face)
+				{
 					// GL_TEXTURE_CUBE_MAP_POSITIVE_X
 				case 0:
 					x = i;
@@ -141,14 +137,16 @@ Bitmap convertVerticalCrossToCubeMapFaces(Bitmap& b) {
 					y = faceHeight + j;
 					break;
 				}
+
 				memcpy(dst, src + (y * b.getWidth() + x) * pixelSize, pixelSize);
+
 				dst += pixelSize;
 			}
 		}
 	}
+
 	return cubemap;
 }
-
 
 int main() {
 	App app;
@@ -158,45 +156,29 @@ int main() {
 	ent.loadModel("models/duck/Duck.gltf");
 
 	ent.transform.scale(glm::vec3(0.05f));
-	ent.transform.translate(glm::vec3(0.0f, -4.0f, -12.0f));
+	ent.transform.translate(glm::vec3(0.0f, -4.5f, -10.0f));
 
 	Core::Render::Bitmap envMap;
 	envMap.load("textures/piazza_bologni_1k.hdr", Core::Render::BitmapFormat_Float);
 	Core::Render::Bitmap cross = convertEquirectangularMapToVerticalCross(envMap);
-	//Core::Render::Bitmap cubemap = convertVerticalCrossToCubeMapFaces(cross);
-	//cubemap.save("textures/cubemap.hdr");
+	Core::Render::Bitmap cubemap = convertVerticalCrossToCubeMapFaces(cross);
 
 	Core::GL::Texture crossTexture;
 	crossTexture.setup();
 	crossTexture.load(cross, Core::GL::TextureOptions::HDR());
 
-	//GLuint cubemapTex;
-	//glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &cubemapTex);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_BASE_LEVEL, 0);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_MAX_LEVEL, 0);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTextureParameteri(cubemapTex, GL_TEXTURE_CUBE_MAP_SEAMLESS, GL_TRUE);
-	//glTextureStorage2D(cubemapTex, 1, GL_RGB32F, cross.getWidth(), cross.getHeight());
-	//std::vector<uint8_t> cubeData = cross.getData();
-	//const uint8_t* data = cubeData.data();
-
-	//for (unsigned int i = 0; i < 6; ++i) {
-	//	glTextureSubImage3D(cubemapTex, 0, 0, 0, i, cross.getWidth(), cross.getHeight(), 1, GL_RGB, GL_FLOAT, data);
-	//	data += cross.getWidth() * cross.getHeight() * cross.getComponentCount() * Core::Render::Bitmap::BytesPerComponent(cross.getFormat());
-	//}
+	Core::GL::Texture cubemapTex;
+	cubemapTex.setup();
+	cubemapTex.load(cubemap, Core::GL::TextureOptions::CubeMapf());
 
 	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 
 	float spin = 0.0f;
-	app.run([&ent, &spin, &crossTexture](App* app, int width, int height) {
+	app.run([&ent, &spin, &crossTexture, &cubemapTex](App* app, int width, int height) {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
+		cubemapTex.bind(1);
 		ent.transform.rotateY(spin);
-		crossTexture.bind(5);
 		ent.draw(app->camera);
 		spin += 3.1415f / 180.0f;
 		app->gui.drawTextureWindowGL("Duck Texture", ent.model.meshes[0].textures[0].getId());

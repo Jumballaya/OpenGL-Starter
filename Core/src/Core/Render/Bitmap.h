@@ -39,7 +39,7 @@ namespace Core {
 			int getComponentCount();
 			BitmapFormat getFormat();
 			BitmapType getType();
-			std::vector<uint8_t> getData() { return data; };
+			std::vector<uint8_t>& getData() { return data; };
 
 			void setType(BitmapType typ) { type = typ; }
 
@@ -48,6 +48,7 @@ namespace Core {
 				if (format == BitmapFormat_Float) return 4;
 			}
 
+			std::vector<uint8_t> data;
 		private:
 			int width = 0;
 			int height = 0;
@@ -56,7 +57,6 @@ namespace Core {
 
 			BitmapFormat format = BitmapFormat_UnsignedByte;
 			BitmapType type = BitmapType_2D;
-			std::vector<uint8_t> data;
 
 			// Set/Get pixels
 			using setPixel_t = void(Bitmap::*)(int, int, const glm::vec4&);

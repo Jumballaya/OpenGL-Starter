@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-out vec4 out_FragColor;
+out vec4 outColor;
 
 in vec2 v_uv;
 in vec3 v_normal;
@@ -13,8 +13,8 @@ layout(std140, binding = 0) uniform camera {
 	uniform mat4 projection_matrix;
 	uniform vec4 camera_position;
 };
-layout (binding = 0) uniform sampler2D u_texture_diffuse_0;
-layout (binding = 2) uniform samplerCube texture1;
+layout (binding = 0) uniform sampler2D texture0;
+layout (binding = 1) uniform samplerCube texture1;
 
 void main() {
 	vec3 n = normalize(v_normal);
@@ -27,9 +27,10 @@ void main() {
 	const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
 	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-v, n)), 5.0);
 
-	vec4 color = texture(u_texture_diffuse_0, v_uv);
+	vec4 albedo = texture(texture0, v_uv);
+	vec4 color = albedo;
 	vec4 colorRefl = texture(texture1, reflection);
 	vec4 colorRefr = texture(texture1, refraction);
 	color = color * mix(colorRefl, colorRefr, Rtheta);
-	out_FragColor = color;
+	outColor = color;
 }

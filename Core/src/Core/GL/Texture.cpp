@@ -70,7 +70,19 @@ namespace Core {
 
 			glTextureStorage2D(texId, 1, opts.internalFormat, w, h);
 			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-			glTextureSubImage2D(texId, 0, 0, 0, w, h, opts.format, opts.type, img);
+
+			int comps = 3;                                 // TODO: get the component count in this function
+			int byteCount = opts.type == GL_FLOAT ? 4 : 1; // TODO: get byte count by type
+
+			if (opts.textureType == GL_TEXTURE_CUBE_MAP) {
+				for (unsigned i = 0; i < 6; ++i) {
+					glTextureSubImage3D(texId, 0, 0, 0, i, w, h, 1, opts.format, opts.type, img);
+					img += w * h * comps * byteCount;
+				}
+			}
+			if (opts.textureType == GL_TEXTURE_2D) {
+				glTextureSubImage2D(texId, 0, 0, 0, w, h, opts.format, opts.type, img);
+			}
 			loaded = true;
 		}
 

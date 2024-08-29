@@ -18,13 +18,45 @@ namespace Core {
 			GLint wrapS = GL_CLAMP_TO_EDGE;
 			GLint wrapT = GL_CLAMP_TO_EDGE;
 			GLint wrapR = GL_CLAMP_TO_EDGE;
-			GLint internalFormat = GL_RGBA;
+			GLint internalFormat = GL_RGBA8;
 			GLint format = GL_RGBA;
 			GLint type = GL_UNSIGNED_BYTE;
 			GLint textureType = GL_TEXTURE_2D;
 
 			static TextureOptions HDR() {
 				TextureOptions opts;
+				opts.format = GL_RGB;
+				opts.type = GL_FLOAT;
+				opts.internalFormat = GL_RGB32F;
+				opts.wrapS = GL_CLAMP_TO_EDGE;
+				opts.wrapT = GL_CLAMP_TO_EDGE;
+				opts.wrapS = GL_CLAMP_TO_EDGE;
+				opts.maxLevel = 0;
+				opts.baseLevel = 0;
+				opts.minFilter = GL_LINEAR;
+				opts.magFilter = GL_LINEAR;
+				return opts;
+			}
+
+			static TextureOptions CubeMap() {
+				TextureOptions opts;
+				opts.textureType = GL_TEXTURE_CUBE_MAP;
+				opts.format = GL_RGBA;
+				opts.type = GL_UNSIGNED_BYTE;
+				opts.internalFormat = GL_RGBA8;
+				opts.wrapS = GL_CLAMP_TO_EDGE;
+				opts.wrapT = GL_CLAMP_TO_EDGE;
+				opts.wrapS = GL_CLAMP_TO_EDGE;
+				opts.maxLevel = 0;
+				opts.baseLevel = 0;
+				opts.minFilter = GL_LINEAR;
+				opts.magFilter = GL_LINEAR;
+				return opts;
+			}
+
+			static TextureOptions CubeMapf() {
+				TextureOptions opts;
+				opts.textureType = GL_TEXTURE_CUBE_MAP;
 				opts.format = GL_RGB;
 				opts.type = GL_FLOAT;
 				opts.internalFormat = GL_RGB32F;
