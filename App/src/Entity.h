@@ -16,7 +16,7 @@ public:
 	void loadModel(std::string path);
 	void destroy();
 
-	void draw(Core::Render::Camera& camera);
+	void draw();
 
 	Core::Render::Model model;
 	Core::GL::Shader shader;

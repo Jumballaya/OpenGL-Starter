@@ -57,7 +57,6 @@ namespace Core {
 		void Mesh::draw(GL::Shader& shader) {
 			for (int i = 0; i < textures.size(); i++) {
 				textures[i].bind(i);
-				shader.uniform_i(textures[i].name, i);
 			}
 
 			vao.bind();

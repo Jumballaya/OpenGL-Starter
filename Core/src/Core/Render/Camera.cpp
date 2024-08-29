@@ -37,5 +37,9 @@ namespace Core {
 			cameraData.camera_position.z = position.z;
 		}
 
+		glm::vec3 Camera::getPosition() {
+			return cameraData.camera_position;
+		}
+
 	}
 }

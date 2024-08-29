@@ -26,6 +26,8 @@ namespace Core {
 			void update();
 			void destroy();
 
+			glm::vec3 getPosition();
+
 		private:
 			Transform view;
 			GL::UniformBuffer<CameraData> ubo;

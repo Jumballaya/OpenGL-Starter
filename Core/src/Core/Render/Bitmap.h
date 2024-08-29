@@ -48,6 +48,8 @@ namespace Core {
 				if (format == BitmapFormat_Float) return 4;
 			}
 
+			static Bitmap GenerateCubeMap(std::string path, BitmapFormat format);
+
 			std::vector<uint8_t> data;
 		private:
 			int width = 0;

@@ -1,7 +1,5 @@
 #version 460 core
 
-precision mediump float;
-
 out vec4 outColor;
 
 in vec2 v_uv;
@@ -25,10 +23,9 @@ void main() {
 	vec3 refraction = -normalize(refract(v, n, eta));
 
 	const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
-	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-v, n)), 5.0);
+	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-v, n)), 0.25);
 
-	vec4 albedo = texture(texture0, v_uv);
-	vec4 color = albedo;
+	vec4 color = texture(texture0, v_uv);
 	vec4 colorRefl = texture(texture1, reflection);
 	vec4 colorRefr = texture(texture1, refraction);
 	color = color * mix(colorRefl, colorRefr, Rtheta);
