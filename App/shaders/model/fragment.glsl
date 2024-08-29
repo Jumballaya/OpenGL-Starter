@@ -23,7 +23,7 @@ void main() {
 	vec3 refraction = -normalize(refract(v, n, eta));
 
 	const float R0 = ((1.0-eta) * (1.0-eta)) / ((1.0+eta) * (1.0+eta));
-	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-v, n)), 0.25);
+	const float Rtheta = R0 + (1.0 - R0) * pow((1.0 - dot(-v, n)), 1.0);
 
 	vec4 color = texture(texture0, v_uv);
 	vec4 colorRefl = texture(texture1, reflection);

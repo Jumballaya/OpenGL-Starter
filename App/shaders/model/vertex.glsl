@@ -19,6 +19,6 @@ void main() {
 	gl_Position = projection_matrix * view_matrix * u_model_matrix * a_position;
 	mat3 normalMatrix = mat3(transpose(inverse(u_model_matrix)));
 	v_uv = a_uv;
-	v_normal = a_normals * normalMatrix;
+	v_normal = normalMatrix * a_normals;
 	v_world_pos = (u_model_matrix * a_position).xyz;
 }
