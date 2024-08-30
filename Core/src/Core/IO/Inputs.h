@@ -32,7 +32,7 @@ namespace Core {
 
 			bool isMousePressed(MouseButton button);
 			bool isKeyPressed(unsigned int key);
-			glm::vec2& getMousePosition();
+			glm::vec2 getMousePosition() const;
 
 		private:
 			std::unordered_map<unsigned int, bool> keystate;

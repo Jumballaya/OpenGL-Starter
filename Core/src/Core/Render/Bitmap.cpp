@@ -97,17 +97,13 @@ namespace Core {
 
 			const int pixelSize = cubemap.getComponentCount() * Bitmap::BytesPerComponent(cubemap.getFormat());
 
-			for (int face = 0; face != 6; ++face)
-			{
-				for (int j = 0; j != faceHeight; ++j)
-				{
-					for (int i = 0; i != faceWidth; ++i)
-					{
+			for (int face = 0; face < 6; ++face) {
+				for (int j = 0; j < faceHeight; ++j) {
+					for (int i = 0; i < faceWidth; ++i) {
 						int x = 0;
 						int y = 0;
 
-						switch (face)
-						{
+						switch (face) {
 							// GL_TEXTURE_CUBE_MAP_POSITIVE_X
 						case 0:
 							x = i;
@@ -146,7 +142,6 @@ namespace Core {
 						}
 
 						memcpy(dst, src + (y * b.getWidth() + x) * pixelSize, pixelSize);
-
 						dst += pixelSize;
 					}
 				}

@@ -268,6 +268,24 @@ void Gui::drawTextureWindowGL(const char* title, uint32_t texId) {
 	ImGui::End();
 }
 
+void Gui::drawFPSDisplayGL(const float fps) {
+	ImVec2 pos = ImVec2(10.0f, 10.0f);
+	bool open = true;
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
+	ImGui::SetNextWindowPos(pos);
+	ImGui::SetNextWindowBgAlpha(0.65f);
+	ImGui::Begin("FPS", &open, flags);
+	char _fps[16];
+	sprintf(_fps, "FPS: %.1f", fps);
+	ImGui::Text(_fps);
+	ImGui::End();
+}
+
+void Gui::drawDemo() {
+	ImGui::ShowDemoWindow();
+};
+
+
 void Gui::setCursorPosCallback(GLFWwindow* window, double x, double y) {
 	auto& io = ImGui::GetIO();
 	io.AddMousePosEvent((float)x, (float)y);

@@ -33,6 +33,8 @@ public:
 
 	// Components
 	void drawTextureWindowGL(const char* title, uint32_t texId);
+	void drawFPSDisplayGL(const float fps);
+	void drawDemo();
 
 private:
 	GuiData perFrameData;

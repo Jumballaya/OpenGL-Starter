@@ -13,6 +13,7 @@ namespace Core {
 			mousestate[MouseButton_Right] = false;
 			mousestate[MouseButton_Middle] = false;
 
+			mousePosition = glm::vec2(0.0f);
 		}
 
 		void Inputs::updateKeys(unsigned int key, bool pressed) {
@@ -20,7 +21,8 @@ namespace Core {
 		}
 
 		void Inputs::updateMousePosition(glm::vec2& pos) {
-			mousePosition = pos;
+			mousePosition.x = pos.x;
+			mousePosition.y = pos.y;
 		}
 
 		void Inputs::updateMouseButton(MouseButton button, bool pressed) {
@@ -41,7 +43,7 @@ namespace Core {
 			return keystate[key];
 		}
 
-		glm::vec2& Inputs::getMousePosition() {
+		glm::vec2 Inputs::getMousePosition() const {
 			return mousePosition;
 		}
 	}

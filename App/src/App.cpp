@@ -20,7 +20,7 @@ void App::setup() {
 	inputs.setup();
 	inputs.load(GLFW_KEY_MAP);
 	skybox.setup();
-	skybox.load("textures/piazza_bologni_1k.hdr", Core::Render::BitmapFormat_Float);
+	skybox.load("textures/immenstadter_horn_2k_irradiance.hdr", Core::Render::BitmapFormat_Float);
 
 	glfwSetWindowUserPointer(window.getWindowPointer(), &gui);
 	glfwSetWindowUserPointer(window.getWindowPointer(), &inputs);
@@ -70,11 +70,6 @@ void App::setup() {
 		auto gui = static_cast<Gui*>(glfwGetWindowUserPointer(window));
 		gui->setCharCallback(window, c);
 	});
-	glfwSetFramebufferSizeCallback(window.getWindowPointer(), [](auto* window, int width, int height) {
-		glViewport(0, 0, width, height);
-		auto camera = static_cast<Core::Render::Camera*>(glfwGetWindowUserPointer(window));
-		camera->setProjection(glm::radians(70.0f), (float)width / (float)height, 0.01f, 100.0f);
-	});
 }
 
 void App::destroy() {
@@ -86,23 +81,36 @@ void App::destroy() {
 void App::run(const std::function <void(App*, double, int, int)>& fn) {
 	double timeStamp = glfwGetTime();
 	float deltaSeconds = 0.0f;
+	int width, height;
+	window.getSize(&width, &height);
+	glViewport(0, 0, width, height);
+	camera.setProjection(glm::radians(45.0f), (float)width / (float)height, 0.01f, 100.0f);
+	camera.updateData();
+
 	while (!window.shouldClose()) {
+		// Delta time
 		const double newTimeStamp = glfwGetTime();
 		deltaSeconds = static_cast<float>(newTimeStamp - timeStamp);
 		timeStamp = newTimeStamp;
-		int width, height;
-		window.getSize(&width, &height);
-		glViewport(0, 0, width, height);
 
+		// Screen size
+		int frameW, frameH;
+		window.getSize(&frameW, &frameH);
+		if (width != frameW || height != frameH) {
+			width = frameW;
+			height = frameH;
+			glViewport(0, 0, width, height);
+			camera.setProjection(glm::radians(45.0f), (float)width / (float)height, 0.01f, 100.0f);
+			camera.updateData();
+		}
+
+		// Draw screen
 		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
 		gui.startFrame(width, height);
-
 		skybox.draw(camera);
 		camera.update(deltaSeconds, inputs);
 		camera.ubo.bind(0);
 		fn(this, deltaSeconds, width, height);
-
 		gui.draw(width, height);
 		window.update();
 	}

@@ -55,10 +55,6 @@ namespace Core {
 				if (inputs.isKeyPressed(67)) accel -= up;
 				if (inputs.isKeyPressed(340)) accel *= fastCoef;
 
-				if (inputs.isKeyPressed(87)) {
-					std::cout << "forward!!!" << std::endl;
-				}
-
 				if (accel == glm::vec3(0)) {
 					moveSpeed -= moveSpeed * std::min((1.0f / damping) * static_cast<float>(dT), 1.0f);
 				} else {
