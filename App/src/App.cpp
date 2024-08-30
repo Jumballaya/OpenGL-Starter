@@ -20,7 +20,7 @@ void App::setup() {
 	inputs.setup();
 	inputs.load(GLFW_KEY_MAP);
 	skybox.setup();
-	skybox.load("textures/immenstadter_horn_2k_irradiance.hdr", Core::Render::BitmapFormat_Float);
+	skybox.load("textures/immenstadter_horn_2k.hdr", Core::Render::BitmapFormat_Float);
 
 	glfwSetWindowUserPointer(window.getWindowPointer(), &gui);
 	glfwSetWindowUserPointer(window.getWindowPointer(), &inputs);

@@ -77,6 +77,7 @@ namespace Core {
 					glTextureSubImage3D(texId, 0, 0, 0, i, w, h, 1, opts.format, opts.type, img);
 					img += w * h * comps * byteCount;
 				}
+				glTextureParameteri(texId, GL_TEXTURE_CUBE_MAP_SEAMLESS, GL_TRUE);
 			}
 			if (opts.textureType == GL_TEXTURE_2D) {
 				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

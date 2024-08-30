@@ -34,29 +34,17 @@ namespace Core {
 		void Skybox::draw(Camera& camera) {
 			glDisable(GL_CULL_FACE);
 			vao.bind();
+			glm::vec3 camPos = camera.getPosition();
+			camera.moveTo(glm::vec3(0.0f, 0.0f, 0.0f));
 			glm::mat4 m = glm::mat4(1.0f);
+			glm::mat4 v = camera.getViewMatrix();
 			glm::mat4 p = camera.getProjectionMatrix();
-			glm::vec4 pos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-			
-			glm::mat4 transformation = camera.getViewMatrix();
-			glm::vec3 scale;
-			glm::quat rotation;
-			glm::vec3 translation;
-			glm::vec3 skew;
-			glm::vec4 perspective;
-			glm::decompose(transformation, scale, rotation, translation, skew, perspective);
-			rotation = glm::conjugate(rotation);
-
-			glm::mat4 v = glm::rotate(glm::mat4(1.0f), rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-			v = glm::rotate(v, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-			v = glm::rotate(v, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
-			v = glm::inverse(v);
-
-			ubo.setData({ .model = m, .MVP = p * v, .cameraPos = pos });
+			ubo.setData({ .model = m, .MVP = p * v, .cameraPos = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f) });
 			ubo.bind(0);
 			cubemap.bind(1);
 			shader.bind();
-			glDrawArrays(GL_TRIANGLES, 0, 32);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+			camera.moveTo(camPos);
 		}
 	}
 }
