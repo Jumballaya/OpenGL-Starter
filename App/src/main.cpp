@@ -12,16 +12,10 @@ int main() {
 	ent.transform.scale(glm::vec3(0.05f));
 	ent.transform.translate(glm::vec3(0.0f, -4.5f, -10.0f));
 
-	Core::Render::Skybox skybox;
-	skybox.setup();
-	skybox.load("textures/immenstadter_horn_2k.hdr", Core::Render::BitmapFormat_Float);
-
 	glClearColor(0.4f, 0.35f, 0.4f, 1.0f);
 
 	float spin = 0.0f;
-	app.run([&ent, &spin, &skybox](App* app, int width, int height) {
-		skybox.draw(app->camera);
-		app->camera.update();
+	app.run([&ent, &spin](App* app, double dT, int width, int height) {
 		ent.transform.rotateY(spin);
 		ent.draw();
 		spin += 3.1415f / 180.0f;
@@ -29,7 +23,6 @@ int main() {
 	});
 
 	ent.destroy();
-	skybox.destroy();
 	app.destroy();
 
 	exit(EXIT_SUCCESS);

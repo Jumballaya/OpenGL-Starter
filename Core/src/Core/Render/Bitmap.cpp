@@ -25,8 +25,7 @@ namespace Core {
 			return glm::vec3();
 		}
 
-		static Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b)
-		{
+		static Bitmap convertEquirectangularMapToVerticalCross(Bitmap& b) {
 			if (b.getType() != BitmapType_2D) return Bitmap();
 
 			const int faceSize = b.getWidth() / 4;
@@ -85,8 +84,7 @@ namespace Core {
 			return result;
 		}
 
-		static Bitmap convertVerticalCrossToCubeMapFaces(Bitmap& b)
-		{
+		static Bitmap convertVerticalCrossToCubeMapFaces(Bitmap& b) {
 			const int faceWidth = b.getWidth() / 3;
 			const int faceHeight = b.getHeight() / 4;
 

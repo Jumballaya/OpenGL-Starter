@@ -8,7 +8,13 @@
 #include "Core/Render/Camera.h"
 
 namespace Core {
-	namespace Render {		
+	namespace Render {
+		static struct SkyboxFrameData {
+		public:
+			glm::mat4 model;
+			glm::mat4 MVP;
+			glm::vec4 cameraPos;
+		};
 		class Skybox {
 		public:
 			Skybox() = default;
@@ -24,6 +30,7 @@ namespace Core {
 			GL::VertexArray vao;
 			GL::Shader shader;
 			GL::Texture cubemap;
+			GL::UniformBuffer<SkyboxFrameData> ubo;
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
 		};
 	}
