@@ -7,12 +7,12 @@ constexpr uint32_t header_magic_number = 0x12345678;
 
 namespace Core {
 	namespace IO {
-		Render::Mesh MeshFile::convertAIMesh(const aiMesh* m) {
+		MeshData MeshFile::convertAIMesh(const aiMesh* m) {
 			const bool hasTexCoords = m->HasTextureCoords(0);
 			const uint32_t numIndices = m->mNumFaces * 3;
 			const uint32_t streamElementSize = static_cast<uint32_t>(8 * sizeof(float));
 			const uint32_t meshSize = static_cast<uint32_t>(m->mNumVertices * streamElementSize + numIndices * sizeof(uint32_t));
-			const Render::Mesh result = {
+			const MeshData result = {
 				.lodCount = 1,
 				.streamCount = 1,
 				.materialID = 0,
@@ -55,13 +55,13 @@ namespace Core {
 				std::cerr << "ERROR: unable to open mesh file: " << path << std::endl;
 				return;
 			}
-			fread(&header, 1, sizeof(Render::MeshFileHeader), f);
+			fread(&header, 1, sizeof(MeshFileHeader), f);
 			if (header.magicValue != header_magic_number) {
 				std::cerr << "ERROR: something wrong with binary mesh file: " << path << std::endl;
 				return;
 			}
 			meshes.resize(header.meshCount);
-			fread(meshes.data(), header.meshCount, sizeof(Render::Mesh), f);
+			fread(meshes.data(), header.meshCount, sizeof(MeshData), f);
 			indexData.resize(header.indexDataSize);
 			vertexData.resize(header.vertexDataSize);
 			fread(indexData.data(), 1, header.indexDataSize, f);
@@ -97,7 +97,7 @@ namespace Core {
 
 			header.magicValue = header_magic_number;
 			header.meshCount = (uint32_t)meshes.size();
-			header.dataBlockStartOffset = (uint32_t)(sizeof(Render::MeshFileHeader) + meshes.size() * sizeof(Render::Mesh));
+			header.dataBlockStartOffset = (uint32_t)(sizeof(MeshFileHeader) + meshes.size() * sizeof(MeshData));
 			header.indexDataSize = indexData.size() * sizeof(uint32_t);
 			header.vertexDataSize = vertexData.size() * sizeof(float);
 			return;
@@ -106,7 +106,7 @@ namespace Core {
 		void MeshFile::save(std::string path) {
 			FILE* f = fopen(path.c_str(), "wb");
 			fwrite(&header, 1, sizeof(header), f);
-			fwrite(meshes.data(), header.meshCount, sizeof(Render::Mesh), f);
+			fwrite(meshes.data(), header.meshCount, sizeof(MeshData), f);
 			fwrite(indexData.data(), 1, header.indexDataSize, f);
 			fwrite(vertexData.data(), 1, header.vertexDataSize, f);
 			fclose(f);

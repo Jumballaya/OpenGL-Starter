@@ -2,7 +2,7 @@
 #include <memory>
 
 namespace Core {
-	namespace Render {
+	namespace IO {
 		constexpr const uint32_t kMaxLODs = 8;
 		constexpr const uint32_t kMaxStreams = 8;
 
@@ -10,7 +10,7 @@ namespace Core {
 		//    [ ------- LOD 0 ------- ][ ----------- LOD 1 ----------- ]
 		//    [ --- VTX ---][ - IDX - ][ ----- VTX -----][ --- IDX --- ]
 		//       Stream 0     Stream 1      Stream 2         Stream 3
-		struct Mesh final {
+		struct MeshData final {
 			uint32_t lodCount;                                 // max of kMaxLODs
 			uint32_t streamCount;                              // max of kMaxStreams
 			uint32_t materialID;                               //

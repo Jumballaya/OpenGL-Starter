@@ -6,7 +6,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 
-#include "Core/Render/Mesh.h"
+#include "MeshData.h"
 
 namespace Core {
 	namespace IO {
@@ -19,15 +19,15 @@ namespace Core {
 			void loadBinary(std::string filepath);
 			void save(std::string filepath);
 
-			Render::MeshFileHeader header;
-			std::vector<Render::Mesh> meshes;
+			MeshFileHeader header;
+			std::vector<MeshData> meshes;
 			std::vector<uint32_t> indexData;
 			std::vector<float> vertexData;
 
 			bool exportTextures = true;
 			bool exportNormals = true;
 		private:
-			Render::Mesh convertAIMesh(const aiMesh* m);
+			MeshData convertAIMesh(const aiMesh* m);
 
 			uint32_t indexOffset = 0;
 			uint32_t vertexOffset = 0;
