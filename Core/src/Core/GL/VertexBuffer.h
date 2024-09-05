@@ -39,7 +39,7 @@ namespace Core {
 				sizeInBytes = size;
 			};
 			void bind(unsigned int bindPoint) { glBindBufferRange(GL_ARRAY_BUFFER, bindPoint, vbo, 0, sizeInBytes); };
-			void unbind() { glBindBuffer(GL_ARRAY_BUFFER, NULL); };
+			void unbind() { glBindBuffer(GL_ARRAY_BUFFER, 0); };
 
 			GLuint getId() const { return vbo; };
 

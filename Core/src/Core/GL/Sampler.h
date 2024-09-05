@@ -27,12 +27,14 @@ namespace Core {
 			// Move
 			Sampler(Sampler&& other) noexcept {
 				sampler = other.sampler;
+				options = other.options;
 				other.sampler = 0;
 			}
 
 			// Move
 			Sampler& operator=(Sampler&& other) noexcept {
 				sampler = other.sampler;
+				options = other.options;
 				other.sampler = 0;
 				return *this;
 			}

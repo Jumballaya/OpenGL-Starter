@@ -7,7 +7,10 @@ namespace Core {
 		class FrameBuffer {
 		public:
 			FrameBuffer() = default;
-			~FrameBuffer() { if (fbo > 0) glDeleteFramebuffers(1, &fbo); }
+			~FrameBuffer() {
+				if (fbo == 0) return;
+				glDeleteFramebuffers(1, &fbo);
+			}
 
 			// Move
 			FrameBuffer(FrameBuffer&& other) noexcept {

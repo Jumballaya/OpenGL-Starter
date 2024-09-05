@@ -79,13 +79,13 @@ namespace Core {
 			}
 
 			// material
-			if (mesh->mMaterialIndex >= 0) {
-				aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-				std::vector<GL::Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "u_texture_diffuse");
-				textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
-				std::vector<GL::Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
-				textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-			}
+			//if (mesh->mMaterialIndex >= 0) {
+			//	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+			//	std::vector<GL::Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "u_texture_diffuse");
+			//	std::move(textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end()));
+			//	std::vector<GL::Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "u_texture_specular");
+			//	std::move(textures.insert(textures.end(), specularMaps.begin(), specularMaps.end()));
+			//}
 
 			return Mesh(vertices, indices, textures);
 		}
@@ -93,15 +93,15 @@ namespace Core {
 		std::vector<GL::Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName) {
 			std::vector<GL::Texture> textures;
 			unsigned int typeCount = 0;
-			for (int i = 0; i < mat->GetTextureCount(type); i++) {
-				aiString str;
-				mat->GetTexture(type, i, &str);
-				GL::Texture tex = loadTextureFromFile(str.C_Str(), directory);
-				std::string filename = std::string(str.C_Str());
-				std::string path = directory + '/' + filename;
-				textures.push_back(tex);
-			}
-			return textures;
+			//for (int i = 0; i < mat->GetTextureCount(type); i++) {
+			//	aiString str;
+			//	mat->GetTexture(type, i, &str);
+			//	GL::Texture tex = loadTextureFromFile(str.C_Str(), directory);
+			//	std::string filename = std::string(str.C_Str());
+			//	std::string path = directory + '/' + filename;
+			//	textures.push_back(std::move(tex));
+			//}
+			return std::move(textures);
 		}
 
 		GL::Texture Model::loadTextureFromFile(const char* path, const std::string& directory) {
@@ -111,34 +111,35 @@ namespace Core {
 			GL::Texture tex;
 			GL::TextureOptions opts;
 
-			int width, height, comps;
-			uint8_t* data = stbi_load(filename.c_str(), &width, &height, &comps, 0);
-			if (data) {
-				GLenum format = GL_RGBA;
-				GLenum internalFormat = GL_RGBA8;
-				if (comps == 1) {
-					opts.format = GL_RED;
-					opts.internalFormat = GL_R8;
-				}
-				else if (comps == 3) {
-					opts.format = GL_RGB;
-					opts.internalFormat = GL_RGB8;
-				}
-				else if (comps == 4) {
-					opts.format = GL_RGBA;
-					opts.internalFormat = GL_RGBA8;
-				}
+			//int width, height, comps;
+			//uint8_t* data = stbi_load(filename.c_str(), &width, &height, &comps, 0);
+			//if (data) {
+			//	GLenum format = GL_RGBA;
+			//	GLenum internalFormat = GL_RGBA8;
+			//	if (comps == 1) {
+			//		opts.format = GL_RED;
+			//		opts.internalFormat = GL_R8;
+			//	}
+			//	else if (comps == 3) {
+			//		opts.format = GL_RGB;
+			//		opts.internalFormat = GL_RGB8;
+			//	}
+			//	else if (comps == 4) {
+			//		opts.format = GL_RGBA;
+			//		opts.internalFormat = GL_RGBA8;
+			//	}
 
-				tex.initialize();
-				tex.load(data, width, height, opts);
-				stbi_image_free(data);
-			}
-			else {
-				std::cout << "Texture failed to load at path: " << path << std::endl;
-				stbi_image_free(data);
-			}
+			//	tex.initialize();
+			//	tex.load(data, width, height, opts);
+			//	stbi_image_free(data);
+			//}
+			//else {
+			//	std::cout << "Texture failed to load at path: " << path << std::endl;
+			//	stbi_image_free(data);
+			//}
 
-			return tex;
+			//return std::move(tex);
+			return GL::Texture();
 		}
 	}
 }

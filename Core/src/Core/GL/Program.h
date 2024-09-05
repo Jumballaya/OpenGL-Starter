@@ -10,12 +10,33 @@ namespace Core {
 	namespace GL {
 		class Program {
 		public:
-			Program() = default;
-			~Program() { if (program > 0) glDeleteProgram(program); };
+			Program() : program(0) {};
+
+			~Program() {
+				if (program == 0) return;
+				glDeleteProgram(program);
+			};
+
+			// Move
+			Program(Program&& other) noexcept {
+				program = other.program;
+				uniform_locations = other.uniform_locations;
+				other.program = 0;
+			}
+
+			// Move
+			Program& operator=(Program&& other) noexcept {
+				program = other.program;
+				uniform_locations = other.uniform_locations;
+				other.program = 0;
+				return *this;
+			}
 
 			void initialize() { program = glCreateProgram(); }
-			void load(ShaderStage shader) {
+			void attach(ShaderStage& shader) {
 				glAttachShader(program, shader.getId());
+			};
+			void link() {
 				glLinkProgram(program);
 
 				char infoLog[512];
@@ -26,7 +47,7 @@ namespace Core {
 					std::cerr << "ERROR: Shader Program link failure\n" << infoLog << std::endl;
 					return;
 				}
-			};
+			}
 
 			void bind() { glUseProgram(program); }
 			void unbind() { glUseProgram(0); }

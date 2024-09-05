@@ -14,6 +14,21 @@ namespace Core {
 			glDeleteBuffers(1, &ebo);
 		};
 
+		// Move
+		ElementBuffer(ElementBuffer&& other) noexcept {
+			ebo = other.ebo;
+			sizeInBytes = other.sizeInBytes;
+			other.ebo = 0;
+		}
+
+		// Move
+		ElementBuffer& operator=(ElementBuffer&& other) noexcept {
+			ebo = other.ebo;
+			sizeInBytes = other.sizeInBytes;
+			other.ebo = 0;
+			return *this;
+		}
+
 		void initialize() { glCreateBuffers(1, &ebo); }
 
 		void load(unsigned int size, unsigned int* data) {

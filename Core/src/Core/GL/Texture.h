@@ -73,6 +73,29 @@ namespace Core {
 				glDeleteTextures(1, &texId);
 			};
 
+			// Move
+			Texture(Texture&& other) noexcept {
+				texId = other.texId;
+				loaded = other.loaded;
+				other.texId = 0;
+			}
+
+			// Move
+			Texture& operator=(Texture&& other) noexcept {
+				texId = other.texId;
+				loaded = other.loaded;
+				other.texId = 0;
+				return *this;
+			}
+
+			// COPY
+			Texture(const Texture& other) noexcept {
+				texId = other.texId;
+				loaded = other.loaded;
+				// other.texId = 0;
+				std::cout << "Texture copied" << std::endl;
+			}
+
 			void initialize() {}; // API completeness
 			void load(Render::Bitmap& bitmap, const TextureOptions& opts) {
 				if (loaded) return;

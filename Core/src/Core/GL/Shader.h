@@ -22,12 +22,13 @@ namespace Core {
 			void load(std::string vertexPath, std::string fragmentPath) {
 				ShaderStage vertex;
 				ShaderStage fragment;
-				vertex.initialize();
-				fragment.initialize();
+				vertex.initialize(GL_VERTEX_SHADER);
 				vertex.load(vertexPath);
+				program.attach(vertex);
+				fragment.initialize(GL_FRAGMENT_SHADER);
 				fragment.load(fragmentPath);
-				program.load(vertex);
-				program.load(fragment);
+				program.attach(fragment);
+				program.link();
 			};
 
 			void bind() { program.bind(); }

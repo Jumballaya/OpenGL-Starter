@@ -20,6 +20,7 @@ namespace Core {
 		class VertexArray {
 		public:
 			VertexArray() = default;
+
 			~VertexArray() {
 				if (vao == 0) return;
 				glDeleteVertexArrays(1, &vao);
@@ -30,7 +31,7 @@ namespace Core {
 				vao = other.vao;
 				vertex_count = other.vertex_count;
 				buffers = std::move(other.buffers);
-				elementBuffer = other.elementBuffer;
+				elementBuffer = std::move(other.elementBuffer);
 				other.vao = 0;
 			}
 
@@ -39,7 +40,7 @@ namespace Core {
 				vao = other.vao;
 				vertex_count = other.vertex_count;
 				buffers = std::move(other.buffers);
-				elementBuffer = other.elementBuffer;
+				elementBuffer = std::move(other.elementBuffer);
 				other.vao = 0;
 				return *this;
 			}
@@ -88,7 +89,7 @@ namespace Core {
 				return buffers[id];
 			};
 
-			ElementBuffer getElementBuffer() {
+			ElementBuffer& getElementBuffer() {
 				return elementBuffer;
 			};
 

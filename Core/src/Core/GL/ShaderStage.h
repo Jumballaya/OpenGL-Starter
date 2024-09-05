@@ -39,10 +39,29 @@ namespace Core {
 		class ShaderStage {
 		public:
 			ShaderStage() = default;
-			~ShaderStage() { if (shader > 0) glDeleteShader(shader); }
+			~ShaderStage() {
+				if (shader == 0) return;
+				glDeleteShader(shader);
+			}
 
-			void initialize(GLenum type = GL_VERTEX_SHADER) {
-				shader = glCreateShader(GL_VERTEX_SHADER);
+			// Move
+			ShaderStage(ShaderStage&& other) noexcept {
+				shader = other.shader;
+				shaderType = other.shaderType;
+				other.shader = 0;
+			}
+
+			// Move
+			ShaderStage& operator=(ShaderStage&& other) noexcept {
+				shader = other.shader;
+				shaderType = other.shaderType;
+				other.shader = 0;
+				return *this;
+			}
+
+
+			void initialize(GLenum type) {
+				shader = glCreateShader(type);
 				shaderType = type;
 			}
 			void load(std::string path) {
@@ -50,7 +69,6 @@ namespace Core {
 				std::string directory = path.substr(0, path.find_last_of('/'));
 				glsl_inject_includes(sourceString, directory);
 				const GLchar* source = sourceString.data();
-				GLuint shader = glCreateShader(shaderType);
 				glShaderSource(shader, 1, &source, NULL);
 				glCompileShader(shader);
 
@@ -65,6 +83,7 @@ namespace Core {
 			};
 
 			GLuint getId() { return shader; }
+			GLenum getType() { return shaderType; }
 
 		private:
 			GLuint shader;

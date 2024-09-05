@@ -10,7 +10,18 @@ namespace Core {
 				assert(_avgIntervalSec > 0.0f);
 			}
 
-			bool tick(double dT, bool frameRendered = true);
+			bool tick(double dT, bool frameRendered) {
+				float deltaSeconds = static_cast<float>(dT);
+				if (frameRendered) numFrames++;
+				accumulatedTime += deltaSeconds;
+				if (accumulatedTime < avgIntervalSec) {
+					return false;
+				}
+				currentFPS = static_cast<float>(numFrames / accumulatedTime);
+				numFrames = 0;
+				accumulatedTime = 0;
+				return true;
+			}
 
 			inline float getFPS() const { return currentFPS; }
 
