@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <glad/glad.h>
 
 namespace Core {
@@ -10,29 +9,51 @@ namespace Core {
     class UniformBuffer {
     public:
         UniformBuffer(unsigned int idx = 0) : index(idx) {};
-        ~UniformBuffer() = default;
+        ~UniformBuffer() {
+            if (buffer == 0) return;
+            glDeleteBuffers(1, &buffer);
+        };
 
-        void setup() {
+        // Move
+        UniformBuffer(UniformBuffer&& other) noexcept {
+            buffer = other.buffer;
+            index = other.index;
+            other.buffer = 0;
+        }
+
+        // Move
+        UniformBuffer& operator=(UniformBuffer&& other) noexcept {
+            buffer = other.buffer;
+            index = other.index;
+            other.buffer = 0;
+            return *this;
+        }
+
+        void initialize() {
             glCreateBuffers(1, &buffer);
+        }
+
+        void load(unsigned int idx) {
+            index = idx;
             glNamedBufferStorage(buffer, sizeof(T), nullptr, GL_DYNAMIC_STORAGE_BIT);
             glBindBufferRange(GL_UNIFORM_BUFFER, index, buffer, 0, sizeof(T));
         }
 
-        void setData(T data) {
+        void update(T data) {
             glNamedBufferSubData(buffer, 0, sizeof(T), &data);
         }
 
-        void bind(unsigned int idx) {
-            index = idx;
+        void bind(unsigned int idx = index) {
+            if (idx != index) index = idx;
             glBindBufferRange(GL_UNIFORM_BUFFER, index, buffer, 0, sizeof(T));
         }
 
-        void destroy() {
-            glDeleteBuffers(1, &buffer);
-        }
+        GLuint getId() { return buffer; }
+
+        void unbind() {} // dummy function for API completeness for now
 
     private:
-        unsigned int buffer = 0;
+        GLuint buffer = 0;
         unsigned int index;
     };
 

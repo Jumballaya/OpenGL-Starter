@@ -6,8 +6,12 @@
 
 #include <glad/glad.h>
 
+#include "ShaderStage.h"
+#include "Program.h"
+
 namespace Core {
-	namespace GL {	
+	namespace GL {
+		// Program + ShaderStage[] + Uniforms
 		class Shader {
 		public:
 			Shader();
@@ -26,7 +30,7 @@ namespace Core {
 			void uniform_m(std::string name, unsigned int size, float* value);
 
 		private:
-			GLuint program;
+			Program program;
 			std::unordered_map<std::string, GLuint> uniform_locations;
 			GLuint get_location(std::string name);
 
