@@ -68,7 +68,7 @@ namespace Core {
 				}
 
 				vertex_count = size / vertexElems / 4;
-				buffers.push_back(buffer);
+				buffers.push_back(std::move(buffer));
 			}
 
 			void loadElementBuffer(

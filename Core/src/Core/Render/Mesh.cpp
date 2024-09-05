@@ -16,7 +16,7 @@ namespace Core {
 		}
 
 		void Mesh::setup() {
-			vao.setup();
+			vao.initialize();
 		};
 
 		void Mesh::load(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::vector<Core::GL::Texture> textures) {
@@ -31,18 +31,8 @@ namespace Core {
 			vao.unbind();
 		};
 
-		void Mesh::destroy() {
-			vao.destroy();
-			for (GL::Texture tex : textures) {
-				tex.destroy();
-			}
-			vertices.clear();
-			indices.clear();
-			textures.clear();
-		};
-
 		void Mesh::setupMesh() {
-			vao.setup();
+			vao.initialize();
 			vao.bind();
 			vao.loadElementBuffer(indices.size() * sizeof(GLuint), &indices[0]);
 			auto attrList = std::vector<GL::VertexAttribute>({

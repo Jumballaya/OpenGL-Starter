@@ -14,11 +14,9 @@ namespace Core {
 		class Model {
 		public:
 			Model() = default;
-			~Model() = default;
 
 			void setup();
 			void load(std::string path);
-			void destroy();
 
 			void draw(GL::Shader& shader);
 

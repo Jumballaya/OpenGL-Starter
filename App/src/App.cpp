@@ -15,11 +15,11 @@ App::~App() {
 void App::setup() {
 	window.setup(800, 600);
 	auto controller = Core::Render::CameraControllerFPS();
-	camera.setup();
+	camera.initialize();
 	gui.setup();
 	inputs.setup();
 	inputs.load(GLFW_KEY_MAP);
-	skybox.setup();
+	skybox.initialize();
 	skybox.load("textures/immenstadter_horn_2k.hdr", Core::Render::BitmapFormat_Float);
 
 	glfwSetWindowUserPointer(window.getWindowPointer(), &gui);
@@ -73,7 +73,6 @@ void App::setup() {
 }
 
 void App::destroy() {
-	skybox.destroy();
 	gui.destroy();
 	window.destroy();
 }

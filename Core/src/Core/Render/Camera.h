@@ -115,11 +115,9 @@ namespace Core {
 			Camera() {
 				projectionMatrix = glm::perspective(45.0f, 800.0f / 600.0f, 0.01f, 1000.0f);
 			};
-			~Camera() = default;
 
-			void setup();
+			void initialize();
 			void update(double dT, IO::Inputs& inputs);
-			void destroy();
 
 			void setProjection(float fov, float aspect, float near, float far);
 			void moveTo(glm::vec3 position);
@@ -130,8 +128,7 @@ namespace Core {
 			glm::mat4 getProjectionMatrix() const { return projectionMatrix; }
 
 			static Camera CreateFPSCamera() {
-				Camera cam;
-				return cam;
+				return Camera();
 			};
 
 			GL::UniformBuffer<CameraData> ubo;

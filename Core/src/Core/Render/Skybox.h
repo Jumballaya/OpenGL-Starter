@@ -18,11 +18,9 @@ namespace Core {
 		class Skybox {
 		public:
 			Skybox() = default;
-			~Skybox() = default;
 
-			void setup();
+			void initialize();
 			void load(std::string path, BitmapFormat fmt);
-			void destroy();
 
 			void draw(Camera& camera);
 

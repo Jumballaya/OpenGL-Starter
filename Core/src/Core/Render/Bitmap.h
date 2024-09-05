@@ -21,7 +21,6 @@ namespace Core {
 		class Bitmap {
 		public:
 			Bitmap() = default;
-			~Bitmap() = default;
 
 			void setup() {};
 			void load(std::string path, BitmapFormat fmt);

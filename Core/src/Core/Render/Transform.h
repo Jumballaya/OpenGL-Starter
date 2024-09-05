@@ -8,7 +8,6 @@ namespace Core {
 		class Transform {
 		public:
 			Transform();
-			~Transform() = default;
 
 			void rotateX(float x);
 			void rotateY(float y);

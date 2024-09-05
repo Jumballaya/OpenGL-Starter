@@ -10,32 +10,6 @@
 
 #include <glad/glad.h>
 
-class VertexArray {
-public:
-	VertexArray() = default;
-	~VertexArray() { if (vao > 0) glDeleteVertexArrays(1, &vao); }
-
-	// Move
-	VertexArray(VertexArray&& other) noexcept {
-		vao = other.vao;
-		other.vao = 0;
-	}
-
-	// Move
-	VertexArray& operator=(VertexArray&& other) noexcept {
-		vao = other.vao;
-		other.vao = 0;
-		return *this;
-	}
-
-	void initialize() { glCreateVertexArrays(1, &vao); }
-	void bind() { glBindVertexArray(vao); }
-	void unbind() { glBindVertexArray(0); }
-
-private:
-	GLuint vao;
-};
-
 int main() {
 	//App app;
 	//Entity ent;

@@ -30,12 +30,6 @@ namespace Core {
 			processNode(scene->mRootNode, scene);
 		}
 
-		void Model::destroy() {
-			for (auto mesh : meshes) {
-				mesh.destroy();
-			}
-		}
-
 		void Model::processNode(aiNode* node, const aiScene* scene) {
 			for (int i = 0; i < node->mNumMeshes; i++) {
 				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -105,9 +99,6 @@ namespace Core {
 				GL::Texture tex = loadTextureFromFile(str.C_Str(), directory);
 				std::string filename = std::string(str.C_Str());
 				std::string path = directory + '/' + filename;
-				tex.name = typeName + "_" + std::to_string(typeCount++);
-				tex.fileName = filename;
-				tex.path = path;
 				textures.push_back(tex);
 			}
 			return textures;
@@ -119,9 +110,6 @@ namespace Core {
 
 			GL::Texture tex;
 			GL::TextureOptions opts;
-
-			tex.path = filename;
-			tex.fileName = std::string(path);
 
 			int width, height, comps;
 			uint8_t* data = stbi_load(filename.c_str(), &width, &height, &comps, 0);
@@ -141,7 +129,7 @@ namespace Core {
 					opts.internalFormat = GL_RGBA8;
 				}
 
-				tex.setup();
+				tex.initialize();
 				tex.load(data, width, height, opts);
 				stbi_image_free(data);
 			}

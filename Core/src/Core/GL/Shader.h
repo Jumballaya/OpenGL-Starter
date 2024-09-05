@@ -14,29 +14,73 @@ namespace Core {
 		// Program + ShaderStage[] + Uniforms
 		class Shader {
 		public:
-			Shader();
-			~Shader() = default;
+			Shader() = default;
 
-			void setup();
-			void load(std::string vertexPath, std::string fragmentPath);
-			void destroy();
+			void initialize() {
+				program.initialize();
+			}
+			void load(std::string vertexPath, std::string fragmentPath) {
+				ShaderStage vertex;
+				ShaderStage fragment;
+				vertex.initialize();
+				fragment.initialize();
+				vertex.load(vertexPath);
+				fragment.load(fragmentPath);
+				program.load(vertex);
+				program.load(fragment);
+			};
 
-			void bind();
-			void unbind();
+			void bind() { program.bind(); }
+			void unbind() { program.unbind(); }
 
-			void uniform_f(std::string name, float value);
-			void uniform_v(std::string name, unsigned int size, float* value);
-			void uniform_i(std::string name, int value);
-			void uniform_m(std::string name, unsigned int size, float* value);
+			void uniform_f(std::string name, float value) {
+				if (program.getId() == 0) return;
+				unsigned int loc = program.getLocation(name);
+				glUniform1f(loc, value);
+			}
+
+			void uniform_v(std::string name, unsigned int size, float* value) {
+				if (program.getId() == 0) return;
+				unsigned int loc = program.getLocation(name);
+				switch (size) {
+				case 1:
+					uniform_f(name, value[0]);
+					return;
+				case 2:
+					glUniform2fv(loc, 1, value);
+					return;
+				case 3:
+					glUniform3fv(loc, 1, value);
+					return;
+				case 4:
+					glUniform4fv(loc, 1, value);
+				}
+			}
+
+			void uniform_m(std::string name, unsigned int size, float* value) {
+				if (program.getId() == 0) return;
+				unsigned int loc = program.getLocation(name);
+				switch (size) {
+				case 2:
+					glUniformMatrix2fv(loc, 1, false, value);
+					return;
+				case 3:
+					glUniformMatrix3fv(loc, 1, false, value);
+					return;
+				case 4:
+					glUniformMatrix4fv(loc, 1, false, value);
+					return;
+				}
+			}
+
+			void uniform_i(std::string name, int value) {
+				if (program.getId() == 0) return;
+				unsigned int loc = program.getLocation(name);
+				glUniform1i(loc, value);
+			}
 
 		private:
 			Program program;
-			std::unordered_map<std::string, GLuint> uniform_locations;
-			GLuint get_location(std::string name);
-
-			GLuint compileShader(GLenum type, std::string path);
-
-			bool compiled = false;
 		};
 	}
 }

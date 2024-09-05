@@ -145,9 +145,9 @@ static ImGuiKey get_imgui_key(int key) {
 Gui::Gui() {}
 
 void Gui::setup() {
-	guiShader.setup();
+	guiShader.initialize();
 	guiShader.load("shaders/imgui/vertex.glsl", "shaders/imgui/fragment.glsl");
-	vao.setup();
+	vao.initialize();
 	vao.bind();
 	vao.loadVertexBuffer(128 * 1024, sizeof(ImDrawVert), nullptr, std::vector<Core::GL::VertexAttribute>({
 		{ 2, IM_OFFSETOF(ImDrawVert, pos), GL_FLOAT, false },
@@ -158,7 +158,7 @@ void Gui::setup() {
 	vao.unbind();
 
 	guiShader.bind();
-	perFrameUbo.setup();
+	perFrameUbo.initialize();
 	perFrameData.data = glm::identity<glm::mat4>();
 	ImGui::CreateContext();
 
@@ -182,9 +182,8 @@ void Gui::setup() {
 	Core::GL::TextureOptions opts;
 	opts.format = GL_RGBA;
 	opts.internalFormat = GL_RGBA8;
-	texFont.setup();
+	texFont.initialize();
 	texFont.load(pixels, width, height, opts);
-	texFont.name = "Texture";
 
 	io.Fonts->TexID = (ImTextureID)(intptr_t)texFont.getId();
 	io.FontDefault = Font;
@@ -238,7 +237,7 @@ void Gui::draw(int width, int height) {
 	const float B = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
 
 	perFrameData.data = glm::ortho(L, R, B, T);
-	perFrameUbo.setData(perFrameData);
+	perFrameUbo.update(perFrameData);
 
 	for (int n = 0; n < draw_data->CmdListsCount; n++) {
 		const ImDrawList* cmd_list = draw_data->CmdLists[n];

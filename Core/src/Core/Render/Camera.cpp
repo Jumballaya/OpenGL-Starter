@@ -9,12 +9,8 @@ namespace Core {
 			updateData();
 		}
 
-		void Camera::setup() {
-			ubo.setup();
-		}
-
-		void Camera::destroy() {
-			ubo.destroy();
+		void Camera::initialize() {
+			ubo.initialize();
 		}
 
 		void Camera::setProjection(float fov, float aspect, float near, float far) {
@@ -29,7 +25,7 @@ namespace Core {
 
 		void Camera::updateData() {
 			glm::vec3 pos = controller.getPosition();
-			ubo.setData({
+			ubo.update({
 				.view_matrix = controller.getViewMatrix(),
 				.projection_matrix = projectionMatrix,
 				.camera_position = glm::vec4(pos[0], pos[1], pos[2], 1.0)
